@@ -1,16 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
-import withLayout from '../components/Layout'
-import { NextPage } from 'next'
-import Link from 'next/link'
-import fetch from 'isomorphic-unfetch'
+import withLayout from "../components/Layout";
+import { NextPage } from "next";
+import Link from "next/link";
+import fetch from "isomorphic-unfetch";
 
 interface POST {
-  title: string,
-  id: string
+  title: string;
+  id: string;
 }
 
-const PostLink = (props:POST) => (
+const PostLink = (props: POST) => (
   <>
     <li>
       <Link href={`/post?title=${props.title}`}>
@@ -31,7 +31,7 @@ const PostLink = (props:POST) => (
       li:nth-child(odd) a {
         text-decoration: none;
         color: green;
-        font-family: 'Arial';
+        font-family: "Arial";
       }
 
       a:hover {
@@ -39,7 +39,7 @@ const PostLink = (props:POST) => (
       }
     `}</style>
   </>
-)
+);
 
 const Blog = () => {
   return (
@@ -51,15 +51,18 @@ const Blog = () => {
         <PostLink title="Deploy apps with Zeit" id="deploy-nextjs" />
       </ul>
     </div>
-  )
-}
+  );
+};
 
 interface SHOW {
-  id: string,
-  name: string
+  id: string;
+  name: string;
 }
 
-const Home: NextPage<{ userAgent: string, shows: SHOW[] }> = ({ userAgent, shows }) => (
+const Home: NextPage<{ userAgent: string; shows: SHOW[] }> = ({
+  userAgent,
+  shows
+}) => (
   <div>
     <h1>Hello world! - user agent: {userAgent}</h1>
     <Blog />
@@ -73,48 +76,66 @@ const Home: NextPage<{ userAgent: string, shows: SHOW[] }> = ({ userAgent, shows
         </li>
       ))}
     </ul>
-      <style jsx>{`
-        h1,
-        a {
-          font-family: 'Arial';
-        }
+    <style jsx>{`
+      h1,
+      a {
+        font-family: "Arial";
+      }
 
-        ul {
-          padding: 0;
-        }
+      ul {
+        padding: 0;
+      }
 
-        li {
-          list-style: none;
-          margin: 5px 0;
-        }
+      li {
+        list-style: none;
+        margin: 5px 0;
+      }
 
-        a {
-          text-decoration: none;
-          color: blue;
-        }
+      a {
+        text-decoration: none;
+        color: blue;
+      }
 
-        a:hover {
-          opacity: 0.6;
-        }
-      `}</style>
+      a:hover {
+        opacity: 0.6;
+      }
+    `}</style>
   </div>
-)
+);
 
 Home.getInitialProps = async ({ req }) => {
+  const userAgent = req ? req.headers["user-agent"] || "" : navigator.userAgent;
+
   // const q = req.query.q || 'lamb'
-  const q = 'dad'
-  const url = `https://api.tvmaze.com/search/shows?q=${q}`
-  console.log(`fetching ${url}`)
-  const res = await fetch(url)
-  const data = await res.json()
+  const q = "mad";
+  const url = `https://api.tvmaze.com/search/shows?q=${q}`;
+  console.log(`fetching ${url}`);
 
-  const userAgent = req ? req.headers['user-agent'] || '' : navigator.userAgent
-  console.log(`Show data fetched. Count: ${data.length}`)
-
-  return {
-    userAgent,
-    shows: data.map((entry:{show: SHOW}) => entry.show)
+function checkStatus(res: Response): Response {
+  if (res.ok) {
+    // res.status >= 200 && res.status < 300
+    return res;
+  } else {
+    throw Error(res.statusText);
   }
 }
 
-export default withLayout(Home)
+
+  const res = await fetch(url, {})
+    .then(checkStatus)
+    .catch(err => {
+      console.error(err);
+    });
+
+  const data = res ? await res.json() : ([] as SHOW[]);
+
+  console.log(`Show data fetched. Count: ${data.length}`);
+  const shows = data.map((entry: { show: SHOW }) => entry.show);
+
+  return {
+    userAgent,
+    shows
+  };
+};
+
+export default withLayout(Home);
