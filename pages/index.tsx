@@ -14,7 +14,7 @@ const PostLink = (props: POST) => (
   <>
     <li>
       <Link href={`/post?title=${props.title}`}>
-        <a>{props.title}</a>
+        <a href={`/post?title=${props.title}`}>{props.title}</a>
       </Link>
     </li>
     <li>
@@ -55,8 +55,8 @@ const Blog = () => {
 };
 
 interface SHOW {
-  id: string;
-  name: string;
+  imdbID: string;
+  Title: string;
 }
 
 const Home: NextPage<{ userAgent: string; shows: SHOW[] }> = ({
@@ -69,9 +69,9 @@ const Home: NextPage<{ userAgent: string; shows: SHOW[] }> = ({
     <h1>Batman TV Shows</h1>
     <ul>
       {shows.map(show => (
-        <li key={show.id}>
-          <Link href="/p/[id]" as={`/p/${show.id}`}>
-            <a>{show.name}</a>
+        <li key={show.imdbID}>
+          <Link href="/p/[id]" as={`/p/${show.imdbID}`}>
+            <a>{show.Title}</a>
           </Link>
         </li>
       ))}
@@ -107,19 +107,19 @@ Home.getInitialProps = async ({ req }) => {
   const userAgent = req ? req.headers["user-agent"] || "" : navigator.userAgent;
 
   // const q = req.query.q || 'lamb'
-  const q = "mad";
-  const url = `https://api.tvmaze.com/search/shows?q=${q}`;
+  const q = "father";
+  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${q}`;
   console.log(`fetching ${url}`);
 
-function checkStatus(res: Response): Response {
-  if (res.ok) {
-    // res.status >= 200 && res.status < 300
-    return res;
-  } else {
-    throw Error(res.statusText);
+  function checkStatus(res: Response): Response {
+    console.log({res})
+    if (res.ok) {
+      // res.status >= 200 && res.status < 300
+      return res;
+    } else {
+      throw Error(res.statusText);
+    }
   }
-}
-
 
   const res = await fetch(url, {})
     .then(checkStatus)
@@ -127,10 +127,9 @@ function checkStatus(res: Response): Response {
       console.error(err);
     });
 
-  const data = res ? await res.json() : ([] as SHOW[]);
-
-  console.log(`Show data fetched. Count: ${data.length}`);
-  const shows = data.map((entry: { show: SHOW }) => entry.show);
+  const predata = res && res.ok ? await res.json() : ([] as SHOW[]);
+  const shows = res && res.ok ? predata.Search : ([] as SHOW[]);
+  console.log(`Show data fetched. Count: ${shows.length}`);
 
   return {
     userAgent,

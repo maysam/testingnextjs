@@ -8,12 +8,12 @@ import { NextPageContext } from "next";
 
 interface DetailedShow {
   id: string,
-  name: string,
-  summary: string,
+  Title: string,
+  Plot: string,
   url: string,
-  image: {medium: string},
-  language: string,
-  genres: string[]
+  Poster: string,
+  Language: string,
+  Actors: string
 }
 
 const Post = (show: DetailedShow) => {
@@ -24,23 +24,23 @@ const Post = (show: DetailedShow) => {
       <h1>{router.query.id}</h1>
       <p>This is the blog post content.</p>
       <a href={show.url}>
-        <h1>{show.name}</h1>
+        <h1>{show.Plot}</h1>
       </a>
-      <a href={show.url}>{show.name}</a>
+      <a href={show.url}>{show.Title}</a>
 
-      <p>{show.summary.replace(/<[/]?[pb]>/g, "")}</p>
-      <img alt="" src={show.image && show.image.medium} />
+      <p>{show.Plot.replace(/<[/]?[pb]>/g, "")}</p>
+      <img alt="" src={show.Poster} />
       <p>
         <label>Language: </label>
 
-        <Link href="/c/[tag]" as={`/c/${show.language}`}>
-          <a>{show.language}</a>
+        <Link href="/c/[tag]" as={`/c/${show.Language}`}>
+          <a>{show.Language}</a>
         </Link>
       </p>
       <div>
         <h2>Genres</h2>
         <ol>
-          {show.genres.map(genre => (
+          {show.Actors.split(', ').map(genre => (
             <li key={genre}>
               <Link href="/c/[tag]" as={`/c/${genre}`}>
                 <a>{genre}</a>
@@ -55,11 +55,12 @@ const Post = (show: DetailedShow) => {
 
 Post.getInitialProps = async (context: NextPageContext) => {
   const { id } = context.query;
-  const res = await fetch(`https://api.tvmaze.com/shows/${id}`);
+  const url = `http://www.omdbapi.com/?apikey=bcafd89c&i=${id}`;
+  const res = await fetch(url);
   const show: DetailedShow = await res.json();
 
-  console.log(`Fetched show: ${show.name}`);
-  console.log(show);
+  console.log(`Fetched show: ${show.Title}`);
+  console.log({show});
 
   return show;
 };
