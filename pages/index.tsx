@@ -1,13 +1,11 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
-import withLayout from "../components/Layout";
-import { NextPage } from "next";
-import Link from "next/link";
-import fetch from "isomorphic-unfetch";
+import { NextPage } from 'next'
+import Link from 'next/link'
+import fetch from 'isomorphic-unfetch'
+// import withLayout from './components/Layout'
 
 interface POST {
-  title: string;
-  id: string;
+  title: string
+  id: string
 }
 
 const PostLink = (props: POST) => (
@@ -31,7 +29,7 @@ const PostLink = (props: POST) => (
       li:nth-child(odd) a {
         text-decoration: none;
         color: green;
-        font-family: "Arial";
+        font-family: 'Arial';
       }
 
       a:hover {
@@ -39,7 +37,7 @@ const PostLink = (props: POST) => (
       }
     `}</style>
   </>
-);
+)
 
 const Blog = () => {
   return (
@@ -51,35 +49,38 @@ const Blog = () => {
         <PostLink title="Deploy apps with Zeit" id="deploy-nextjs" />
       </ul>
     </div>
-  );
-};
-
-interface SHOW {
-  imdbID: string;
-  Title: string;
+  )
 }
 
-const Home: NextPage<{ userAgent: string; shows: SHOW[] }> = ({
-  userAgent,
-  shows
-}) => (
+interface SHOW {
+  imdbID: string
+  Title: string
+}
+
+interface Props {
+  userAgent?: string
+  shows?: SHOW[]
+}
+
+const Home: NextPage<Props> = ({ userAgent, shows }) => (
   <div>
     <h1>Hello world! - user agent: {userAgent}</h1>
     <Blog />
     <h1>Batman TV Shows</h1>
     <ul>
-      {shows.map(show => (
-        <li key={show.imdbID}>
-          <Link href="/p/[id]" as={`/p/${show.imdbID}`}>
-            <a>{show.Title}</a>
-          </Link>
-        </li>
-      ))}
+      {shows &&
+        shows.map(show => (
+          <li key={show.imdbID}>
+            <Link href="/p/[id]" as={`/p/${show.imdbID}`}>
+              <a>{show.Title}</a>
+            </Link>
+          </li>
+        ))}
     </ul>
     <style jsx>{`
       h1,
       a {
-        font-family: "Arial";
+        font-family: 'Arial';
       }
 
       ul {
@@ -101,40 +102,40 @@ const Home: NextPage<{ userAgent: string; shows: SHOW[] }> = ({
       }
     `}</style>
   </div>
-);
+)
 
 Home.getInitialProps = async ({ req }) => {
-  const userAgent = req ? req.headers["user-agent"] || "" : navigator.userAgent;
+  const userAgent = req ? req.headers['user-agent'] || '' : navigator.userAgent
 
   // const q = req.query.q || 'lamb'
-  const q = "father";
-  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${q}`;
-  console.log(`fetching ${url}`);
+  const q = 'father'
+  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${q}`
+  console.log(`fetching ${url}`)
 
   function checkStatus(res: Response): Response {
-    console.log({res})
+    console.log({ res })
     if (res.ok) {
       // res.status >= 200 && res.status < 300
-      return res;
+      return res
     } else {
-      throw Error(res.statusText);
+      throw Error(res.statusText)
     }
   }
 
   const res = await fetch(url, {})
     .then(checkStatus)
     .catch(err => {
-      console.error(err);
-    });
+      console.error(err)
+    })
 
-  const predata = res && res.ok ? await res.json() : ([] as SHOW[]);
-  const shows = res && res.ok ? predata.Search : ([] as SHOW[]);
-  console.log(`Show data fetched. Count: ${shows.length}`);
+  const predata = res && res.ok ? await res.json() : ([] as SHOW[])
+  const shows = res && res.ok ? predata.Search : ([] as SHOW[])
+  console.log(`Show data fetched. Count: ${shows.length}`)
 
   return {
     userAgent,
-    shows
-  };
-};
+    shows,
+  }
+}
 
-export default withLayout(Home);
+export default Home

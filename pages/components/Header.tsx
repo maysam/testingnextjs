@@ -1,10 +1,8 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
-import Link from "next/link";
+import Link from 'next/link'
 
 const linkStyle = {
-  marginRight: 15
-};
+  marginRight: 15,
+}
 
 const Header = () => (
   <div>
@@ -14,7 +12,10 @@ const Header = () => (
     <Link href="/about">
       <a style={linkStyle}>About</a>
     </Link>
+    <Link href="/agent">
+      <a style={linkStyle}>Agent</a>
+    </Link>
   </div>
-);
+)
 
-export default Header;
+export default Header

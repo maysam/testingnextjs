@@ -1,8 +1,3 @@
-import React from "react";
-import withLayout from "../components/Layout";
+const About = () => <h1>About maysam</h1>
 
-import { NextPage } from "next";
-
-const Home: NextPage<{}> = () => <h1>About maysam</h1>;
-
-export default withLayout(Home);
+export default About
