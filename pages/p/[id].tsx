@@ -98,7 +98,7 @@ Post.getInitialProps = async (context: NextPageContext) => {
   const res = await fetch(url)
   const result = await res.json()
 
-  return result['Response'] === 'True' ?  result as DetailedShow : {}
+  return result['Response'] === 'True' ? (result as DetailedShow) : {}
 }
 
 export default Post

@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-// import withLayout from './components/Layout'
+import { List } from 'antd'
 
 interface POST {
   title: string
@@ -66,17 +66,20 @@ const Home: NextPage<Props> = ({ userAgent, shows }) => (
   <div>
     <h1>Hello world! - user agent: {userAgent}</h1>
     <Blog />
-    <h1>Batman TV Shows</h1>
-    <ul>
-      {shows &&
-        shows.map(show => (
-          <li key={show.imdbID}>
-            <Link href="/p/[id]" as={`/p/${show.imdbID}`}>
-              <a>{show.Title}</a>
-            </Link>
-          </li>
-        ))}
-    </ul>
+    <List
+      size="small"
+      header={<div>Movies</div>}
+      footer={<div>No Footer</div>}
+      bordered
+      dataSource={shows}
+      renderItem={item => (
+        <List.Item>
+          <Link href="/p/[id]" as={`/p/${item.imdbID}`}>
+            <a>{item.Title}</a>
+          </Link>
+        </List.Item>
+      )}
+    />
     <style jsx>{`
       h1,
       a {

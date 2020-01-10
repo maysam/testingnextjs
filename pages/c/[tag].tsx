@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import { NextPage, NextPageContext } from 'next'
 import dynamic from 'next/dynamic'
+import { List } from 'antd'
 const Link = dynamic(() => import('next/link'))
 
 interface SHOW {
@@ -15,21 +16,23 @@ interface POSTS {
 
 const PostPAGE: NextPage<POSTS> = props => {
   const router = useRouter()
+  const header = <div>Movies with {router.query.tag}</div>
   const shows = props.shows
   return (
     <div>
-      <h1>{router.query.tag}</h1>
-
-      <h1>Batman TV Shows</h1>
-      <ul>
-        {shows.map((show: SHOW) => (
-          <li key={show.imdbID}>
-            <Link href="/p/[id]" as={`/p/${show.imdbID}`}>
-              <a>{show.Title}</a>
+      <List
+        size="small"
+        header={header}
+        bordered
+        dataSource={shows}
+        renderItem={item => (
+          <List.Item>
+            <Link href="/p/[id]" as={`/p/${item.imdbID}`}>
+              <a>{item.Title}</a>
             </Link>
-          </li>
-        ))}
-      </ul>
+          </List.Item>
+        )}
+      />
     </div>
   )
 }
