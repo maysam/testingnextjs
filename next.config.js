@@ -6,8 +6,7 @@ const analyzer = require('@next/bundle-analyzer')
 
 const config = {
   exportTrailingSlash: true,
-  poweredByHeader: false,
-  exportPathMap: function() {
+  exportPathMap: () => {
     const paths = {
       '/': { page: '/' },
       '/about': { page: '/about' },
@@ -35,6 +34,7 @@ if (typeof require !== 'undefined') {
 module.exports = withLess({
   ...withBundleAnalyzer(config),
   target: 'serverless',
+  poweredByHeader: false,
   lessLoaderOptions: {
     javascriptEnabled: true,
     modifyVars: themeVariables, // make your antd custom effective

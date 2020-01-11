@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { List } from 'antd'
+import { Alert, List, Form, Icon, Input, Button } from 'antd'
 
 interface POST {
   title: string
@@ -55,89 +55,115 @@ const Blog = () => {
 interface SHOW {
   imdbID: string
   Title: string
+  Year: string
 }
 
 interface Props {
   userAgent?: string
   shows?: SHOW[]
+  message: string
+  total: string
 }
 
-const Home: NextPage<Props> = ({ userAgent, shows }) => (
-  <div>
-    <h1>Hello world! - user agent: {userAgent}</h1>
-    <Blog />
-    <List
-      size="small"
-      header={<div>Movies</div>}
-      footer={<div>No Footer</div>}
-      bordered
-      dataSource={shows}
-      renderItem={item => (
-        <List.Item>
-          <Link href="/p/[id]" as={`/p/${item.imdbID}`}>
-            <a>{item.Title}</a>
-          </Link>
-        </List.Item>
+const Home: NextPage<Props> = ({ userAgent, shows, total, message }) => {
+  const footer = <div>Total is {total}</div>
+  return (
+    <div>
+      <Blog />
+
+      <Form layout="inline" onSubmit={() => true}>
+        <Form.Item>
+          <Input
+            name="keyword"
+            prefix={<Icon type="search" style={{ color: 'rgba(0,0,0,.25)' }} />}
+            placeholder="keyword"
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Search
+          </Button>
+        </Form.Item>
+      </Form>
+      {message || (
+        <List
+          size="small"
+          header={<div>Movies</div>}
+          footer={footer}
+          bordered
+          dataSource={shows}
+          renderItem={item => (
+            <List.Item>
+              <Link href="/p/[id]" as={`/p/${item.imdbID}`}>
+                <div>
+                  <a>{item.Title}</a> ({item.Year})
+                </div>
+              </Link>
+            </List.Item>
+          )}
+        />
       )}
-    />
-    <style jsx>{`
-      h1,
-      a {
-        font-family: 'Arial';
-      }
+      <Alert message={userAgent} type="success" />
+      <style jsx>{`
+        h1,
+        a {
+          font-family: 'Arial';
+        }
 
-      ul {
-        padding: 0;
-      }
+        ul {
+          padding: 0;
+        }
 
-      li {
-        list-style: none;
-        margin: 5px 0;
-      }
+        li {
+          list-style: none;
+          margin: 5px 0;
+        }
 
-      a {
-        text-decoration: none;
-        color: blue;
-      }
+        a {
+          text-decoration: none;
+          color: blue;
+        }
 
-      a:hover {
-        opacity: 0.6;
-      }
-    `}</style>
-  </div>
-)
+        a:hover {
+          opacity: 0.6;
+        }
+      `}</style>
+    </div>
+  )
+}
 
-Home.getInitialProps = async ({ req }) => {
+Home.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
   const userAgent = req ? req.headers['user-agent'] || '' : navigator.userAgent
 
-  // const q = req.query.q || 'lamb'
-  const q = 'father'
-  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${q}`
+  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${keyword || 'keyword'}`
   console.log(`fetching ${url}`)
 
   function checkStatus(res: Response): Response {
-    console.log({ res })
     if (res.ok) {
+      console.log('res is ok')
       // res.status >= 200 && res.status < 300
       return res
     } else {
+      console.log({ res })
       throw Error(res.statusText)
     }
   }
 
-  const res = await fetch(url, {})
+  const result = await fetch(url, {})
     .then(checkStatus)
     .catch(err => {
       console.error(err)
     })
 
-  const predata = res && res.ok ? await res.json() : ([] as SHOW[])
-  const shows = res && res.ok ? predata.Search : ([] as SHOW[])
+  const predata = result && result.ok ? await result.json() : ([] as SHOW[])
+  const shows = predata.Response === 'True' ? predata.Search : ([] as SHOW[])
   console.log(`Show data fetched. Count: ${shows.length}`)
 
   return {
     userAgent,
     shows,
+    total: predata.totalResults,
+    message: predata.Error,
   }
 }
 

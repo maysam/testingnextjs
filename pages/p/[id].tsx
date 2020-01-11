@@ -2,10 +2,12 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
 import { NextPageContext } from 'next'
+import { Tag } from 'antd'
 
 interface DetailedShow {
   id: string
   Title: string
+  imdbRating: string
   Plot: string
   url: string
   Poster: string
@@ -21,24 +23,18 @@ const Post = (show: DetailedShow) => {
   if (show.Title === undefined) {
     return <div>{router.query.id}</div>
   }
-
-  const title = show.url ? (
-    <a href={show.url}>
-      <h1>{show.Title}</h1>
-    </a>
-  ) : (
-    <h1>{show.Title}</h1>
-  )
+  const url = show.url || 'https://www.imdb.com/title/' + router.query.id
 
   return (
     <div>
-      {title}
+      <a href={url}>
+        <h1>{show.Title}</h1>
+      </a>
+      <Tag color="purple">{router.query.id}</Tag>
+      <Tag color="geekblue">{show.imdbRating}</Tag>
 
-      <code>
-        {router.query.id} {show.url}
-      </code>
+      <code>{url}</code>
       <p>{show.Plot.replace(/<[/]?[pb]>/g, '')}</p>
-
       <img alt="" src={show.Poster} />
       <div>
         <h2>Language: </h2>
