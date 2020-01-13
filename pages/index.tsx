@@ -155,7 +155,7 @@ Home.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
       console.error(err)
     })
 
-  const predata = result && result.ok ? await result.json() : ([] as SHOW[])
+  const predata = result && result.ok ? await result.json() : { Response: 'False' }
   const shows = predata.Response === 'True' ? predata.Search : ([] as SHOW[])
   console.log(`Show data fetched. Count: ${shows.length}`)
 
