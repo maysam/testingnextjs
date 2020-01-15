@@ -73,52 +73,11 @@ class MyDocument extends Document<{ locale: string }> {
           <meta name="msapplication-TileColor" content="#ffffff" />
           <meta name="msapplication-TileImage" content="../static/favicon/ms-icon-144x144.png" />
           <meta name="theme-color" content="#ffffff" />
-          <meta name="Description" content="Abhishek Mehandiratta Portfolio" />
           <link type="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css" />
         </Head>
         <body>
-          <div>abc</div>
           <Main />
           <NextScript />
-          {/* to remove preloader */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-
-        //        if ("serviceWorker" in navigator) {
-        //     navigator.serviceWorker.register("/serviceWorker.js")
-        //         .catch(err => console.error("Service worker registration failed", err);
-        // } else {
-        //     console.log("Service worker not supported");
-        // }
-
-                      // // This is the "Offline copy of pages" service worker
-
-                      // // Add this below content to your HTML page, or add the js file to your page at the very top to register service worker
-
-                      // // Check compatibility for the browser we're running this in
-                      // if ('serviceWorker' in navigator) {
-                      //   if (navigator.serviceWorker.controller) {
-                      //       console.log('[PWA Builder] active service worker found, no need to register')
-                      //   } else {
-                      //       // Register the service worker
-                      //       navigator.serviceWorker
-                      //       .register('service-worker.js', {
-                      //           scope: './'
-                      //       })
-                      //       .then(function (reg) {
-                      //           console.log('[PWA Builder] Service worker has been registered for scope: ' + reg.scope)
-                      //       })
-                      //   }
-                      // }
-                      // function loaded() {
-                      //     document.body.classList.add('loaded');
-                      // }
-                      // setTimeout(loaded, 5000);
-                      // window.addEventListener('load', loaded);
-                  `,
-            }}
-          ></script>
         </body>
       </Html>
     )

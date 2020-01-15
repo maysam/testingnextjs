@@ -45,8 +45,10 @@ const nextConfig = {
     return paths
   },
   target: 'serverless',
+  transformManifest: manifest => ['/'].concat(manifest),
   generateInDevMode: true,
-  generateSw: true,
+  // generateSw: true,
+  swDest: 'static/service-worker.js',
   workboxOpts: {
     maximumFileSizeToCacheInBytes: 500000000,
     swDest: 'static/service-worker.js',

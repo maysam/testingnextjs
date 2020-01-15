@@ -25,19 +25,15 @@ const Header = () => (
           <a style={linkStyle}>Agent</a>
         </Link>
       </Menu.Item>
-      <Menu.Item key="mail">
+      <Menu.Item key="mail" disabled>
         <Icon type="mail" />
         Navigation One
-      </Menu.Item>
-      <Menu.Item key="app" disabled>
-        <Icon type="appstore" />
-        Navigation Two
       </Menu.Item>
       <SubMenu
         title={
           <span className="submenu-title-wrapper">
             <Icon type="setting" />
-            Navigation Three - Submenu
+            Has Submenu
           </span>
         }
       >

@@ -49,7 +49,7 @@
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "export": "next export",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "eslint pages --ext tsx,js --no-ignore",
     "ostart": "react-scripts start",
     "obuild": "react-scripts build",
