@@ -1,11 +1,10 @@
-// const withPlugins = require('next-compose-plugins')
-// const withLess = require('@zeit/next-less')
-const lessToJS = require('less-vars-to-js')
 const fs = require('fs')
 const path = require('path')
-const analyzer = require('@next/bundle-analyzer')
-const withOffline = require('next-offline')
 
+const lessToJS = require('less-vars-to-js')
+const analyzer = require('@next/bundle-analyzer')
+
+const withOffline = require('next-offline')
 const withAntd = require('./next-antd.config')
 
 const withBundleAnalyzer = analyzer({
@@ -20,21 +19,7 @@ if (typeof require !== 'undefined') {
   require.extensions['.less'] = file => {}
 }
 
-const antdConfig = {
-  cssModules: true,
-  cssLoaderOptions: {
-    sourceMap: false,
-    importLoaders: 1,
-  },
-  lessLoaderOptions: {
-    javascriptEnabled: true,
-    modifyVars: themeVariables, // make your antd custom effective
-  },
-}
-
 const nextConfig = {
-  ...antdConfig,
-  // ...offlineConfig,
   exportTrailingSlash: true,
   exportPathMap: () => {
     const paths = {
@@ -45,13 +30,21 @@ const nextConfig = {
     return paths
   },
   target: 'serverless',
-  transformManifest: manifest => ['/'].concat(manifest),
+  // antd config
+  cssModules: true,
+  cssLoaderOptions: {
+    sourceMap: false,
+    importLoaders: 1,
+  },
+  lessLoaderOptions: {
+    javascriptEnabled: true,
+    modifyVars: themeVariables, // make your antd custom effective
+  },
+  // ...offlineConfig,
   generateInDevMode: true,
-  // generateSw: true,
-  swDest: 'static/service-worker.js',
   workboxOpts: {
     maximumFileSizeToCacheInBytes: 500000000,
-    swDest: 'static/service-worker.js',
+    swDest: '../public/service-worker.js',
     runtimeCaching: [
       {
         urlPattern: /^https?.*/,
@@ -74,15 +67,3 @@ const nextConfig = {
 }
 
 module.exports = withOffline(withBundleAnalyzer(withAntd(nextConfig)))
-
-// module.exports = withPlugins(
-//   [
-//     [withAntd, antdConfig],
-//     ,
-//     // withCSS,
-//     // withProgressBar,
-//     // withSourceMaps,
-//     [withOffline, offlineConfig],
-//   ],
-//   nextConfig
-// )

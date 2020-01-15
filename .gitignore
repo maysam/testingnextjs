@@ -24,3 +24,4 @@ yarn-error.log*
 /.next
 /out
 /.vscode
+/public/service-worker.js*
