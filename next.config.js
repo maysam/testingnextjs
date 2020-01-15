@@ -2,10 +2,12 @@ const fs = require('fs')
 const path = require('path')
 
 const lessToJS = require('less-vars-to-js')
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
+
 const analyzer = require('@next/bundle-analyzer')
+const cssLoaderConfig = require('@zeit/next-css/css-loader-config')
 
 const withOffline = require('next-offline')
-const withAntd = require('./next-antd.config')
 
 const withBundleAnalyzer = analyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -15,16 +17,129 @@ const withBundleAnalyzer = analyzer({
 const themeVariables = lessToJS(fs.readFileSync(path.resolve(__dirname, './assets/antd-custom.less'), 'utf8'))
 // fix: prevents error when .less files are required by node
 if (typeof require !== 'undefined') {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   require.extensions['.less'] = file => {}
 }
 
 const nextConfig = {
+  webpack(config, options) {
+    if (!options.defaultLoaders) {
+      throw new Error(
+        'This plugin is not compatible with Next.js versions below 5.0.0 https://err.sh/next-plugins/upgrade'
+      )
+    }
+
+    const { dev, isServer } = options
+
+    if (isServer) {
+      const antStyles = /antd\/.*?\/style\/css.*?/
+      const origExternals = [...config.externals]
+      config.externals = [
+        (context, request, callback) => {
+          if (request.match(antStyles)) return callback()
+          if (typeof origExternals[0] === 'function') {
+            origExternals[0](context, request, callback)
+          } else {
+            callback()
+          }
+        },
+        ...(typeof origExternals[0] === 'function' ? [] : origExternals),
+      ]
+
+      config.module.rules.unshift({
+        test: antStyles,
+        use: 'null-loader',
+      })
+    }
+
+    const { cssModules, cssLoaderOptions, postcssLoaderOptions, lessLoaderOptions = {} } = nextConfig
+
+    // for all less in clint
+    const baseLessConfig = {
+      extensions: ['less'],
+      cssModules,
+      cssLoaderOptions,
+      postcssLoaderOptions,
+      dev,
+      isServer,
+      loaders: [
+        {
+          loader: 'less-loader',
+          options: lessLoaderOptions,
+        },
+      ],
+    }
+
+    config.module.rules.push({
+      test: /\.less$/,
+      exclude: /node_modules/,
+      use: cssLoaderConfig(config, baseLessConfig),
+    })
+
+    // for antd less in client
+    const antdLessConfig = {
+      ...baseLessConfig,
+      ...{ cssModules: false, cssLoaderOptions: {}, postcssLoaderOptions: {} },
+    }
+
+    config.module.rules.push({
+      test: /\.less$/,
+      include: /node_modules/,
+      use: cssLoaderConfig(config, antdLessConfig),
+    })
+
+    // for antd less in server (yarn build)
+    if (isServer) {
+      const antdStyles = /antd\/.*?\/style.*?/
+      const rawExternals = [...config.externals]
+
+      config.externals = [
+        (context, request, callback) => {
+          if (request.match(antdStyles)) {
+            return callback()
+          }
+
+          if (typeof rawExternals[0] === 'function') {
+            rawExternals[0](context, request, callback)
+          } else {
+            callback()
+          }
+        },
+        ...(typeof rawExternals[0] === 'function' ? [] : rawExternals),
+      ]
+
+      config.module.rules.unshift({
+        test: antdStyles,
+        use: 'null-loader',
+      })
+    }
+
+    config.plugins.push(
+      new FilterWarningsPlugin({
+        // ignore ANTD chunk styles [mini-css-extract-plugin] warning
+        exclude: /mini-css-extract-plugin[^]*Conflicting order between:/,
+      })
+    )
+
+    config.module.rules.push({
+      test: /\.worker\.js$/,
+      loader: 'worker-loader',
+      // options: { inline: true }, // also works
+      options: {
+        name: 'static/[hash].worker.js',
+        publicPath: '/_next/',
+      },
+    })
+    return config
+  },
+
+  poweredByHeader: false,
   exportTrailingSlash: true,
   exportPathMap: () => {
     const paths = {
       '/': { page: '/' },
       '/about': { page: '/about' },
+      '/agent': { page: '/agent' },
     }
 
     return paths
@@ -40,12 +155,35 @@ const nextConfig = {
     javascriptEnabled: true,
     modifyVars: themeVariables, // make your antd custom effective
   },
-  // ...offlineConfig,
+  // offlineConfig,
   generateInDevMode: true,
   workboxOpts: {
+    swDest: process.env.NEXT_EXPORT ? 'service-worker.js' : 'static/service-worker.js',
+    cleanupOutdatedCaches: true,
+    clientsClaim: true,
+    skipWaiting: true,
     maximumFileSizeToCacheInBytes: 500000000,
-    swDest: '../public/service-worker.js',
+
     runtimeCaching: [
+      {
+        urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+        handler: 'StaleWhileRevalidate',
+      },
+      {
+        urlPattern: /^https:\/\/fonts\.gstatic\.com/,
+        handler: 'CacheFirst',
+      },
+      {
+        urlPattern: /(\.js$|\.css$|static\/)/,
+        handler: 'StaleWhileRevalidate',
+      },
+      {
+        urlPattern: /^https?:.*\.(png|jpg|jpeg|webp|svg|gif|tiff|js|woff|woff2|json|css)$/,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'images',
+        },
+      },
       {
         urlPattern: /^https?.*/,
         handler: 'NetworkFirst',
@@ -58,12 +196,24 @@ const nextConfig = {
           },
           cacheableResponse: {
             statuses: [0, 200],
+            headers: {
+              'x-test': 'true',
+            },
           },
         },
       },
     ],
   },
-  poweredByHeader: false,
+  experimental: {
+    async rewrites() {
+      return [
+        {
+          source: '/service-worker.js',
+          destination: '/_next/static/service-worker.js',
+        },
+      ]
+    },
+  },
 }
 
-module.exports = withOffline(withBundleAnalyzer(withAntd(nextConfig)))
+module.exports = withOffline(withBundleAnalyzer(nextConfig))
