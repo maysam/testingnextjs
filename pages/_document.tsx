@@ -24,17 +24,17 @@ const getStoredLocale = (req: IncomingMessage | undefined) => {
 
   return defaultLocale
 }
-let locale = 'fa'
+
 class MyDocument extends Document<{ locale: string }> {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx)
-    locale = getStoredLocale(ctx.req)
-    return { ...initialProps }
+    const locale = getStoredLocale(ctx.req)
+    return { ...initialProps, locale }
   }
 
   render() {
     return (
-      <Html lang={locale}>
+      <Html lang={this.props.locale}>
         <Head>
           <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
           <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />

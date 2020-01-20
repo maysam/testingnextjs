@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const fs = require('fs')
 const path = require('path')
 
@@ -156,7 +158,7 @@ const nextConfig = {
     modifyVars: themeVariables, // make your antd custom effective
   },
   // offlineConfig,
-  generateInDevMode: true,
+  generateInDevMode: false,
   workboxOpts: {
     swDest: process.env.NEXT_EXPORT ? 'service-worker.js' : 'static/service-worker.js',
     cleanupOutdatedCaches: true,
@@ -213,6 +215,9 @@ const nextConfig = {
         },
       ]
     },
+  },
+  env: {
+    TEST_VAR1: process.env.TEST_VAR1,
   },
 }
 
