@@ -1,3 +1,5 @@
+import React, { useContext } from 'react'
+import { UserContext } from '../components/UserContext'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
@@ -65,10 +67,36 @@ interface Props {
   total: string
 }
 
-const Home: NextPage<Props> = ({ userAgent, shows, total, message }) => {
+const Index: NextPage<Props> = ({ userAgent, shows, total, message }) => {
   const footer = <div>Total is {total}</div>
+  const {
+    state: {
+      isLoggedIn,
+      user: { name },
+    },
+  } = useContext(UserContext)
   return (
     <div>
+      <div>
+        <h1>Hello, {isLoggedIn ? name : 'stranger.'}</h1>
+
+        {!isLoggedIn ? (
+          <>
+            <Link href="/login">
+              <div>
+                <button>Login</button>
+              </div>
+            </Link>
+            <Link href="/signup">
+              <div>
+                <button>Sign up</button>
+              </div>
+            </Link>
+          </>
+        ) : (
+          <button>Logout</button>
+        )}
+      </div>
       <Blog />
 
       <Form layout="inline" onSubmit={() => true}>
@@ -132,15 +160,13 @@ const Home: NextPage<Props> = ({ userAgent, shows, total, message }) => {
   )
 }
 
-Home.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
-  const userAgent = req ? req.headers['user-agent'] || '' : navigator.userAgent
-
+Index.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
+  const userAgent = req ? 'from server ' + req.headers['user-agent'] : 'from client: ' + navigator.userAgent
   const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${keyword || 'keyword'}`
   console.log(`fetching ${url}`)
 
   function checkStatus(res: Response): Response {
     if (res.ok) {
-      console.log('res is ok')
       // res.status >= 200 && res.status < 300
       return res
     } else {
@@ -151,20 +177,19 @@ Home.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
 
   const result = await fetch(url, {})
     .then(checkStatus)
+    .then(data => data.json())
     .catch(err => {
       console.error(err)
     })
-
-  const predata = result && result.ok ? await result.json() : { Response: 'False' }
-  const shows = predata.Response === 'True' ? predata.Search : ([] as SHOW[])
+  const shows = result.Response === 'True' ? result.Search : ([] as SHOW[])
   console.log(`Show data fetched. Count: ${shows.length}`)
 
   return {
     userAgent,
     shows,
-    total: predata.totalResults,
-    message: predata.Error,
+    total: result.totalResults,
+    message: result.Error,
   }
 }
 
-export default Home
+export default Index

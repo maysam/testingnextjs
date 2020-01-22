@@ -23,6 +23,7 @@
     "jsx": "preserve",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
       "*": [

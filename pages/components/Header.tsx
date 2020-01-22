@@ -1,5 +1,8 @@
+import React, { useContext } from 'react'
 import Link from 'next/link'
 import { Menu, Icon } from 'antd'
+import fetch from 'isomorphic-unfetch'
+import { UserContext } from '../../components/UserContext'
 
 const { SubMenu } = Menu
 
@@ -7,22 +10,52 @@ const linkStyle = {
   marginRight: 15,
 }
 
-const Header = () => (
-  <div>
-    <Menu mode="horizontal">
-      <Menu.Item key="home">
+export default function Header({ active }) {
+  // const handleLogout = ({ key, keyPath, item, domEvent: event }) => {
+  const {
+    dispatch,
+    state: {
+      isLoggedIn,
+      user: { name },
+    },
+  } = useContext(UserContext)
+  const welcome = isLoggedIn ? 'Hello ' + name : 'Home'
+  const handleLogout = ({ domEvent: event }) => {
+    event.preventDefault()
+    fetch('/api/session', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(data => data.json())
+      .then(data => {
+        console.log(data)
+        if (data.status === 'ok') {
+          dispatch({ type: 'clear' })
+        }
+      })
+  }
+  return (
+    <Menu mode="horizontal" selectedKeys={[active]}>
+      <Menu.Item key="Index">
         <Link href="/">
-          <a style={linkStyle}>Home</a>
+          <a style={linkStyle}>{welcome}</a>
         </Link>
       </Menu.Item>
-      <Menu.Item key="about">
+      <Menu.Item key="About">
         <Link href="/about">
           <a style={linkStyle}>About</a>
         </Link>
       </Menu.Item>
-      <Menu.Item key="agent">
+      <Menu.Item key="Agent">
         <Link href="/agent">
           <a style={linkStyle}>Agent</a>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="Conditional">
+        <Link href="/conditional">
+          <a>Conditional</a>
         </Link>
       </Menu.Item>
       <Menu.Item key="mail" disabled>
@@ -38,12 +71,12 @@ const Header = () => (
         }
       >
         <Menu.ItemGroup title="Examples">
-          <Menu.Item key="Category one">
+          <Menu.Item key="Conditional">
             <Link href="/conditional">
               <a>Conditional</a>
             </Link>
           </Menu.Item>
-          <Menu.Item key="setting:2">
+          <Menu.Item key="Hook">
             <Link href="/hook">
               <a>Hook</a>
             </Link>
@@ -54,8 +87,12 @@ const Header = () => (
           <Menu.Item key="setting:4">Option 4</Menu.Item>
         </Menu.ItemGroup>
       </SubMenu>
+      {isLoggedIn && (
+        <Menu.Item key="logout" onClick={handleLogout}>
+          <Icon type="out" />
+          Logout
+        </Menu.Item>
+      )}
     </Menu>
-  </div>
-)
-
-export default Header
+  )
+}

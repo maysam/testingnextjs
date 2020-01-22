@@ -1,8 +1,7 @@
 import { Button, Modal, Breadcrumb, Icon, Row, Col, Layout, Card, Carousel } from 'antd'
 import React from 'react'
 import Link from 'next/link'
-import './styles.less'
-const { Header, Content } = Layout
+const { Content } = Layout
 
 class About extends React.Component {
   state = { visible: false }
@@ -29,25 +28,12 @@ class About extends React.Component {
   render() {
     return (
       <Layout>
-        <Header>
-          <Row justify="space-around" type="flex">
-            <Col span={20}>
-              <Row justify="space-around" type="flex">
-                <Col span={12} md={12} xs={24}>
-                  <span>Welcome to ABC Burger</span>
-                </Col>
-                <Col span={12} md={12} xs={0}>
-                  <span className="ml-30 float-right">
-                    <Icon type="phone" theme="filled" /> Call us 09-999-9999
-                  </span>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Header>
-        <Button type="primary" onClick={this.showModal}>
-          Open Modal
-        </Button>
+        <div>
+          <Button type="primary" onClick={this.showModal}>
+            Open Modal
+          </Button>
+        </div>
+        <br />
         <Modal title="Basic Modal" visible={this.state.visible} onOk={this.handleOk} onCancel={this.handleCancel}>
           <p>Some contents...</p>
           <p>Some contents...</p>
@@ -83,7 +69,7 @@ class About extends React.Component {
               </Link>
             </div>
             <div style={{ width: 'fit-content', margin: 'auto 0px' }}>
-              <Link href="/">
+              <Link href="/about">
                 <a>About us</a>
               </Link>
             </div>

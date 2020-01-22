@@ -218,6 +218,8 @@ const nextConfig = {
   },
   env: {
     TEST_VAR1: process.env.TEST_VAR1,
+    TEST_VAR2: process.env.TEST_VAR2,
+    MONGODB_URI: process.env.MONGODB_URI,
   },
 }
 

@@ -1,14 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
+import Router from 'next/router'
+import fetch from 'isomorphic-unfetch'
 import { Formik } from 'formik'
-import { Form, Button, Input, Icon } from 'antd'
+import { Form, Button, Input, Icon, Alert } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
+import { UserContext } from '../components/UserContext'
 
 interface Props {
   text?: string
 }
 
-export default function wrapper() {
+export default function Conditional() {
   const [count, setCount] = useState(0)
+  const [error, setError] = useState(null)
+  const { dispatch } = useContext(UserContext)
 
   class ConditionalBuildingPage extends React.Component<Props & FormComponentProps> {
     static async getInitialProps() {
@@ -30,6 +35,22 @@ export default function wrapper() {
         if (!err) {
           setCount(count + 10)
           console.log('Received values of form: ', values)
+          fetch('/api/authenticate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+          })
+            .then(data => data.json())
+            .then(data => {
+              if (data.status === 'ok') {
+                dispatch({ type: 'fetch' })
+                Router.push('/')
+              } else {
+                setError(data.message)
+              }
+            })
         }
       })
     }
@@ -40,11 +61,12 @@ export default function wrapper() {
       }
 
       const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
-      const usernameError = isFieldTouched('username') && getFieldError('username')
+      const usernameError = isFieldTouched('email') && getFieldError('email')
       const passwordError = isFieldTouched('password') && getFieldError('password')
 
       const form = (
         <div>
+          {error && <Alert message={error} type="error" showIcon closable />}
           from {this.props.text}
           <br />
           count={count}
@@ -54,9 +76,9 @@ export default function wrapper() {
           <div>{process.env.TEST_VAR2}</div>
           <Form layout="inline" onSubmit={this.handleSubmit}>
             <Form.Item validateStatus={usernameError ? 'error' : ''} help={usernameError || ''}>
-              {getFieldDecorator('username', {
+              {getFieldDecorator('email', {
                 rules: [{ required: true, message: 'Please input your username!' }],
-              })(<Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />)}
+              })(<Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" />)}
             </Form.Item>
             <Form.Item validateStatus={passwordError ? 'error' : ''} help={passwordError || ''}>
               {getFieldDecorator('password', {
@@ -77,7 +99,7 @@ export default function wrapper() {
             </Form.Item>
           </Form>
           <Formik
-            initialValues={{ email: '', password: '' }}
+            initialValues={{ name: '', email: '', password: '' }}
             validate={values => {
               const errors: { email?: string } = {}
               if (!values.email) {
@@ -90,10 +112,23 @@ export default function wrapper() {
             onSubmit={(values, { setSubmitting }) => {
               setCount(count + 1)
               console.log('Received values of form: ', values)
-              // setTimeout(() => {
-              //   alert(JSON.stringify(values, null, 2))
-              setSubmitting(false)
-              // }, 400)
+              fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+              })
+                .then(data => data.json())
+                .then(data => {
+                  console.log({ users: data })
+                  setSubmitting(false)
+                  if (data.status === 'ok') {
+                    Router.push('/')
+                  } else {
+                    setError(data.message)
+                  }
+                })
             }}
           >
             {({
@@ -108,6 +143,16 @@ export default function wrapper() {
             }) => (
               <div>
                 <Form layout="inline" onSubmit={handleSubmit}>
+                  <Form.Item>
+                    <Input
+                      prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                      name="name"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.name}
+                    />
+                    {errors.name && touched.name && errors.name}
+                  </Form.Item>
                   <Form.Item>
                     <Input
                       prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -132,7 +177,7 @@ export default function wrapper() {
                   </Form.Item>
                   <Form.Item>
                     <Button type="primary" htmlType="submit" disabled={isSubmitting}>
-                      Submit
+                      Sign Up
                     </Button>
                   </Form.Item>
                 </Form>
