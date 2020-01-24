@@ -3,7 +3,7 @@ import { UserContext } from '../components/UserContext'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { Alert, List, Form, Icon, Input, Button } from 'antd'
+import { Alert, Divider, List, Form, Icon, Input, Button, Empty } from 'antd'
 
 interface POST {
   title: string
@@ -65,9 +65,10 @@ interface Props {
   shows?: SHOW[]
   message: string
   total: string
+  keyword: string | string[]
 }
 
-const Index: NextPage<Props> = ({ userAgent, shows, total, message }) => {
+const Index: NextPage<Props> = ({ userAgent, keyword, shows, total, message }) => {
   const footer = <div>Total is {total}</div>
   const {
     state: {
@@ -80,6 +81,7 @@ const Index: NextPage<Props> = ({ userAgent, shows, total, message }) => {
       <div>
         <h1>Hello, {isLoggedIn ? name : 'stranger.'}</h1>
 
+        <Divider />
         {!isLoggedIn ? (
           <>
             <Link href="/login">
@@ -97,14 +99,17 @@ const Index: NextPage<Props> = ({ userAgent, shows, total, message }) => {
           <button>Logout</button>
         )}
       </div>
+      <Divider />
       <Blog />
 
+      <Divider />
       <Form layout="inline" onSubmit={() => true}>
         <Form.Item>
           <Input
             name="keyword"
             prefix={<Icon type="search" style={{ color: 'rgba(0,0,0,.25)' }} />}
             placeholder="keyword"
+            defaultValue={keyword}
           />
         </Form.Item>
         <Form.Item>
@@ -113,23 +118,28 @@ const Index: NextPage<Props> = ({ userAgent, shows, total, message }) => {
           </Button>
         </Form.Item>
       </Form>
-      {message || (
-        <List
-          size="small"
-          header={<div>Movies</div>}
-          footer={footer}
-          bordered
-          dataSource={shows}
-          renderItem={item => (
-            <List.Item>
-              <Link href="/p/[id]" as={`/p/${item.imdbID}`}>
-                <div>
-                  <a>{item.Title}</a> ({item.Year})
-                </div>
-              </Link>
-            </List.Item>
-          )}
-        />
+
+      {message === 'Movie not found!' ? (
+        <Empty />
+      ) : (
+        message || (
+          <List
+            size="small"
+            header={<div>Movies</div>}
+            footer={footer}
+            bordered
+            dataSource={shows}
+            renderItem={item => (
+              <List.Item>
+                <Link href="/p/[id]" as={`/p/${item.imdbID}`}>
+                  <div>
+                    <a>{item.Title}</a> ({item.Year})
+                  </div>
+                </Link>
+              </List.Item>
+            )}
+          />
+        )
       )}
       <Alert message={userAgent} type="success" />
       <style jsx>{`
@@ -188,6 +198,7 @@ Index.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
     userAgent,
     shows,
     total: result.totalResults,
+    keyword,
     message: result.Error,
   }
 }

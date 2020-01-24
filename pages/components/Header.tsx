@@ -6,10 +6,6 @@ import { UserContext } from '../../components/UserContext'
 
 const { SubMenu } = Menu
 
-const linkStyle = {
-  marginRight: 15,
-}
-
 export default function Header({ active }) {
   // const handleLogout = ({ key, keyPath, item, domEvent: event }) => {
   const {
@@ -40,27 +36,63 @@ export default function Header({ active }) {
     <Menu mode="horizontal" selectedKeys={[active]}>
       <Menu.Item key="Index">
         <Link href="/">
-          <a style={linkStyle}>{welcome}</a>
+          <a>
+            <Icon type="home" />
+            {welcome}
+          </a>
         </Link>
       </Menu.Item>
+      {isLoggedIn && (
+        <Menu.Item key="AddUser">
+          <Link href="/adduser">
+            <a>
+              <Icon type="user-add"  />
+              Add User
+            </a>
+          </Link>
+        </Menu.Item>
+      )}
+      {isLoggedIn && (
+        <Menu.Item key="AllUsers">
+          <Link href="/users">
+            <a>
+              <Icon type="user" />
+              All Users
+            </a>
+          </Link>
+        </Menu.Item>
+      )}
+      {!isLoggedIn && (
+        <Menu.Item key="Login">
+          <Link href="/login">
+            <a>
+              <Icon type="login" />
+              Login
+            </a>
+          </Link>
+        </Menu.Item>
+      )}
+      {!isLoggedIn && (
+        <Menu.Item key="SignUp">
+          <Link href="/signup">
+            <a>
+              <Icon type="plus-square" />
+              Sign Up
+            </a>
+          </Link>
+        </Menu.Item>
+      )}
       <Menu.Item key="About">
         <Link href="/about">
-          <a style={linkStyle}>About</a>
+          <a>
+            <Icon type="info-circle" />
+            About
+          </a>
         </Link>
       </Menu.Item>
-      <Menu.Item key="Agent">
-        <Link href="/agent">
-          <a style={linkStyle}>Agent</a>
-        </Link>
-      </Menu.Item>
-      <Menu.Item key="Conditional">
-        <Link href="/conditional">
-          <a>Conditional</a>
-        </Link>
-      </Menu.Item>
-      <Menu.Item key="mail" disabled>
-        <Icon type="mail" />
-        Navigation One
+      <Menu.Item key="/Compass" disabled>
+        <Icon type="compass" />
+        Coming Soon
       </Menu.Item>
       <SubMenu
         title={
@@ -89,7 +121,7 @@ export default function Header({ active }) {
       </SubMenu>
       {isLoggedIn && (
         <Menu.Item key="logout" onClick={handleLogout}>
-          <Icon type="out" />
+          <Icon type="logout" />
           Logout
         </Menu.Item>
       )}
