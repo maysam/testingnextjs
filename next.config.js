@@ -3,13 +3,12 @@ require('dotenv').config()
 const fs = require('fs')
 const path = require('path')
 
+const cssLoaderConfig = require('@zeit/next-css/css-loader-config')
 const lessToJS = require('less-vars-to-js')
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 
-const analyzer = require('@next/bundle-analyzer')
-const cssLoaderConfig = require('@zeit/next-css/css-loader-config')
-
 const withOffline = require('next-offline')
+const analyzer = require('@next/bundle-analyzer')
 
 const withBundleAnalyzer = analyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -89,32 +88,6 @@ const nextConfig = {
       include: /node_modules/,
       use: cssLoaderConfig(config, antdLessConfig),
     })
-
-    // for antd less in server (yarn build)
-    if (isServer) {
-      const antdStyles = /antd\/.*?\/style.*?/
-      const rawExternals = [...config.externals]
-
-      config.externals = [
-        (context, request, callback) => {
-          if (request.match(antdStyles)) {
-            return callback()
-          }
-
-          if (typeof rawExternals[0] === 'function') {
-            rawExternals[0](context, request, callback)
-          } else {
-            callback()
-          }
-        },
-        ...(typeof rawExternals[0] === 'function' ? [] : rawExternals),
-      ]
-
-      config.module.rules.unshift({
-        test: antdStyles,
-        use: 'null-loader',
-      })
-    }
 
     config.plugins.push(
       new FilterWarningsPlugin({
