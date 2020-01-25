@@ -1,7 +1,8 @@
 import { Layout, Breadcrumb } from 'antd'
+import Sider from './sider'
 import './styles.less'
 
-const { Header: AntHeader, Footer, Sider, Content } = Layout
+const { Header: AntHeader, Footer, Sider: AntSider, Content } = Layout
 
 import { UserContextProvider } from '../components/UserContext'
 import Header from './components/Header'
@@ -14,6 +15,9 @@ function MyApp({ Component, pageProps }) {
           <Header active={Component.displayName || Component.name || 'Unnamed'} />
         </AntHeader>
         <Layout>
+          <AntSider style={{ backgroundColor: 'white' }}>
+            <Sider />
+          </AntSider>
           <Content style={{ padding: '0 50px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>Home</Breadcrumb.Item>
@@ -24,7 +28,6 @@ function MyApp({ Component, pageProps }) {
               <Component {...pageProps} />
             </div>
           </Content>
-          <Sider style={{ backgroundColor: 'white' }}>Sider</Sider>
         </Layout>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
       </Layout>
