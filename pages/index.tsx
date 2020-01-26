@@ -191,6 +191,15 @@ Index.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
     .catch(err => {
       console.error(err)
     })
+  if (!result) {
+    return {
+      userAgent,
+      shows: [],
+      total: 0,
+      keyword,
+      message: 'Filtered',
+    }
+  }
   const shows = result.Response === 'True' ? result.Search : ([] as SHOW[])
   console.log(`Show data fetched. Count: ${shows.length}`)
 

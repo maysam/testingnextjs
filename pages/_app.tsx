@@ -12,10 +12,11 @@ function MyApp({ Component, pageProps }) {
     <UserContextProvider>
       <Layout className="layout">
         <AntHeader>
+          <div className="logo" />
           <Header active={Component.displayName || Component.name || 'Unnamed'} />
         </AntHeader>
         <Layout>
-          <AntSider style={{ backgroundColor: 'white' }}>
+          <AntSider style={{ backgroundColor: 'rgb(240, 242, 245)' }} breakpoint="lg" collapsedWidth="0">
             <Sider />
           </AntSider>
           <Content style={{ padding: '0 50px' }}>
