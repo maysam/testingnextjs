@@ -3,11 +3,13 @@ import withMiddleware from '../../middlewares/withMiddleware'
 
 const handler = (req, res) => {
   if (req.method === 'POST') {
-    const { email, password } = req.body
-
+    const { method, email, mobile, nid, password } = req.body
+    const params = method == 'email' ? { email } : method == 'mobile' ? { mobile } : { nid }
+    const labels = { email: 'Email Address', mobile: 'Mobile Number', nid: 'National Number' }
+    const label = labels[method]
     return req.db
       .collection('users')
-      .findOne({ email })
+      .findOne(params)
       .then(user => {
         if (user) {
           return argon2.verify(user.password, password).then(result => {
@@ -15,7 +17,7 @@ const handler = (req, res) => {
             return Promise.reject(Error('The password you entered is incorrect'))
           })
         }
-        return Promise.reject(Error('The email does not exist'))
+        return Promise.reject(Error(label + ' does not exist'))
       })
       .then(user => {
         req.session.userId = user._id
