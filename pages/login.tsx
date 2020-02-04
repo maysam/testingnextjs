@@ -3,6 +3,7 @@ import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import { Formik } from 'formik'
 import { Radio, Form, Button, Input, Icon, Alert } from 'antd'
+
 import { UserContext } from '../components/UserContext'
 import { isValidIranianNationalCode } from '../lib/validations'
 
@@ -10,12 +11,35 @@ export default function Login() {
   function LoginForm({ form: { getFieldDecorator, validateFields } }) {
     const [error, setError] = useState<string | null>(null)
     const { dispatch } = useContext(UserContext)
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 8 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    }
+    const tailFormItemLayout = {
+      wrapperCol: {
+        xs: {
+          span: 24,
+          offset: 0,
+        },
+        sm: {
+          span: 16,
+          offset: 8,
+        },
+      },
+    }
     return (
       <Formik
         initialValues={{ method: 'email', mobile: '', nid: '', email: '', password: '' }}
-        validate={() => {
-          setError(null)
-        }}
+        // validate={() => {
+        //   setError(null)
+        //   if you want to remove server error once user starts editing login information
+        // }}
         onSubmit={(_, { setSubmitting }) => {
           validateFields((err, values) => {
             if (err) {
@@ -48,23 +72,12 @@ export default function Login() {
           })
         }}
       >
-        {({
-          values,
-          // errors,
-          // touched,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          isValid,
-          // isValidating,
-          /* and other goodies */
-        }) => (
-          <Form onSubmit={handleSubmit}>
+        {({ values, handleChange, handleSubmit, isSubmitting, isValid }) => (
+          <Form onSubmit={handleSubmit} {...formItemLayout}>
             {error && <Alert message={error} type="error" style={{ marginBottom: 10 }} showIcon closable />}
-            <Form.Item label="Login with" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-              {getFieldDecorator('method', {
-                initialValue: values.method,
-              })(
+            <Form.Item label="Login with">
+              {getFieldDecorator('method', { initialValue: values.method })(
+                // getFieldDecorator is needed so method is included in values sent to server
                 <Radio.Group name="method" onChange={handleChange}>
                   <Radio.Button value="email">Email</Radio.Button>
                   <Radio.Button value="mobile">Mobile Number</Radio.Button>
@@ -73,7 +86,7 @@ export default function Login() {
               )}
             </Form.Item>
             {values.method == 'email' && (
-              <Form.Item hasFeedback>
+              <Form.Item label="Email Address" hasFeedback>
                 {getFieldDecorator('email', {
                   validateFirst: true,
                   rules: [
@@ -82,10 +95,6 @@ export default function Login() {
                       type: 'email',
                       message: 'Invalid Email Format',
                     },
-                    // {
-                    //   pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    //   message: 'Invalid Email format 2',
-                    // },
                   ],
                 })(
                   <Input
@@ -100,7 +109,7 @@ export default function Login() {
               </Form.Item>
             )}
             {values.method == 'mobile' && (
-              <Form.Item hasFeedback>
+              <Form.Item label="Mobile Number" hasFeedback>
                 {getFieldDecorator('mobile', {
                   validateFirst: true,
                   rules: [
@@ -119,7 +128,7 @@ export default function Login() {
               </Form.Item>
             )}
             {values.method == 'nid' && (
-              <Form.Item hasFeedback>
+              <Form.Item label="National ID" hasFeedback>
                 {getFieldDecorator('nid', {
                   validateFirst: true,
                   rules: [
@@ -129,17 +138,27 @@ export default function Login() {
                       message: 'National ID number should be 10 digits long',
                     },
                     {
-                      len: 10,
                       asyncValidator: (_, value) => {
                         return new Promise((resolve, reject) => {
                           if (isValidIranianNationalCode(value)) {
                             resolve()
                           } else {
-                            reject('error message') // can reject with error message
+                            reject('Invalid National ID format') // can reject with error message
                           }
                         })
                       },
-                      message: 'Invalid National ID number',
+                      // message: 'Invalid National ID number',
+                    },
+                    {
+                      // if asyncValidator is not acceptable
+                      validator: (_, value, callback) => {
+                        if (!value || isValidIranianNationalCode(value)) {
+                          callback()
+                        } else {
+                          callback('Invalid National ID format') // can reject with error message
+                        }
+                      },
+                      // message: 'Invalid National ID number',
                     },
                   ],
                 })(
@@ -152,7 +171,7 @@ export default function Login() {
                 )}
               </Form.Item>
             )}
-            <Form.Item hasFeedback>
+            <Form.Item label="Password" hasFeedback>
               {getFieldDecorator('password', {
                 validateFirst: true,
                 rules: [
@@ -177,7 +196,7 @@ export default function Login() {
                 />
               )}
             </Form.Item>
-            <Form.Item>
+            <Form.Item {...tailFormItemLayout}>
               <Button type="primary" htmlType="submit" disabled={isSubmitting || !isValid}>
                 Login
               </Button>

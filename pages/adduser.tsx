@@ -1,3 +1,5 @@
-const AddUser = () => <div>Under Construction</div>
+import SignUp from './signup'
+
+const AddUser = () => <SignUp />
 
 export default AddUser

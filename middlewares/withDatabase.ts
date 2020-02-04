@@ -1,7 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { MongoClient, Db } from 'mongodb'
 
-const client = new MongoClient(process.env.MONGODB_URI || '', { useNewUrlParser: true })
+import mongoose from 'mongoose'
+
+const databaseUrl = process.env.MONGODB_URI || ''
+
+mongoose.Promise = Promise
+mongoose.connect(databaseUrl)
+
+const client = new MongoClient(databaseUrl, { useNewUrlParser: true })
 export type Handler = (req: NextApiRequest & { db: Db }, res: NextApiResponse) => number
 const withDatabase = (handler: Handler) => (req: NextApiRequest & { db: Db }, res: NextApiResponse) => {
   if (!client.isConnected()) {

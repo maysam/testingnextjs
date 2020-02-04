@@ -1,11 +1,10 @@
-import { IncomingMessage } from 'http'
-// import { IncomingMessage } from 'next'
 import Document, { Html, Head, DocumentContext, Main, NextScript } from 'next/document'
 
 import cookie from 'cookie'
-// import cookies from 'js-cookie'
+
 const defaultLocale = 'fa'
-const getStoredLocale = (req: IncomingMessage | undefined) => {
+
+const getStoredLocale = req => {
   if (req) {
     const { headers } = req
     // Attempt to get locale saved cookie

@@ -71,6 +71,7 @@ interface Props {
 const Index: NextPage<Props> = ({ userAgent, keyword, shows, total, message }) => {
   const footer = <div>Total is {total}</div>
   const {
+    dispatch,
     state: {
       isLoggedIn,
       user: { name },
@@ -83,20 +84,18 @@ const Index: NextPage<Props> = ({ userAgent, keyword, shows, total, message }) =
 
         <Divider />
         {!isLoggedIn ? (
-          <>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Link href="/login">
-              <div>
-                <button>Login</button>
-              </div>
+              <Button>Login</Button>
             </Link>
             <Link href="/signup">
-              <div>
-                <button>Sign up</button>
-              </div>
+              <Button>Sign up</Button>
             </Link>
-          </>
+          </div>
         ) : (
-          <button>Logout</button>
+          <Button onClick={() => dispatch({ type: 'logout' })} type="danger">
+            Logout
+          </Button>
         )}
       </div>
       <Divider />

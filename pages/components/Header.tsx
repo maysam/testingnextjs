@@ -1,13 +1,12 @@
 import React, { useContext } from 'react'
 import Link from 'next/link'
 import { Menu, Icon } from 'antd'
-import fetch from 'isomorphic-unfetch'
+
 import { UserContext } from '../../components/UserContext'
 
 const { SubMenu } = Menu
 
 export default function Header({ active }) {
-  // const handleLogout = ({ key, keyPath, item, domEvent: event }) => {
   const {
     dispatch,
     state: {
@@ -15,30 +14,14 @@ export default function Header({ active }) {
       user: { name },
     },
   } = useContext(UserContext)
-  const welcome = isLoggedIn ? 'Hello ' + name : 'Home'
-  const handleLogout = ({ domEvent: event }) => {
-    event.preventDefault()
-    fetch('/api/session', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(data => data.json())
-      .then(data => {
-        console.log(data)
-        if (data.status === 'ok') {
-          dispatch({ type: 'clear' })
-        }
-      })
-  }
+
   return (
     <Menu mode="horizontal" selectedKeys={[active]}>
       <Menu.Item key="Index">
         <Link href="/">
           <a>
             <Icon type="home" />
-            {welcome}
+            {isLoggedIn ? 'Hello ' + name : 'Home'}
           </a>
         </Link>
       </Menu.Item>
@@ -46,7 +29,7 @@ export default function Header({ active }) {
         <Menu.Item key="AddUser">
           <Link href="/adduser">
             <a>
-              <Icon type="user-add"  />
+              <Icon type="user-add" />
               Add User
             </a>
           </Link>
@@ -120,7 +103,7 @@ export default function Header({ active }) {
         </Menu.ItemGroup>
       </SubMenu>
       {isLoggedIn && (
-        <Menu.Item key="logout" onClick={handleLogout}>
+        <Menu.Item key="logout" onClick={() => dispatch({ type: 'logout' })}>
           <Icon type="logout" />
           Logout
         </Menu.Item>
