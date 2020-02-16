@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "12.14.0",
-    "npm": "6.13.4",
-    "yarn": "1.13.0"
+    "node": "^12.14.0",
+    "npm": "^6.13.4",
+    "yarn": "^1.13.0"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^9.1.7",
@@ -16,6 +16,7 @@
     "@types/jest": "^24.0.0",
     "@types/node": "^13.1.2",
     "@zeit/next-less": "^1.0.1",
+    "@zeit/webpack-asset-relocator-loader": "^0.6.2",
     "antd": "^3.26.7",
     "argon2": "^0.25.1",
     "babel-plugin-import": "^1.13.0",
@@ -44,7 +45,6 @@
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^2.14.0",
     "@typescript-eslint/parser": "^2.14.0",
-    "@zeit/webpack-asset-relocator-loader": "^0.6.2",
     "aws-sdk": "^2.607.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
