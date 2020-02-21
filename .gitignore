@@ -25,3 +25,5 @@ yarn-error.log*
 /out
 /.vscode
 /public/service-worker.js*
+
+.now
