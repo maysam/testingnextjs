@@ -23,6 +23,10 @@ if (typeof require !== 'undefined') {
 }
 
 const nextConfig = {
+  lessLoaderOptions: {
+    javascriptEnabled: true,
+    modifyVars: themeVariables, // make your antd custom effective
+  },
   webpack(config, options) {
     if (!options.defaultLoaders) {
       throw new Error(
@@ -30,10 +34,19 @@ const nextConfig = {
       )
     }
 
+    config.plugins.push(
+      new FilterWarningsPlugin({
+        // ignore ANTD chunk styles [mini-css-extract-plugin] warning
+
+        exclude: /Conflicting order/,
+      })
+    )
     const { dev, isServer } = options
 
     if (isServer) {
-      const antStyles = /antd\/.*?\/style\/css.*?/
+      // const antStyles = /antd\/.*\/style.*/
+      const antStyles = /(antd\/.*?\/style).*(?<![.]js)$/
+
       const origExternals = [...config.externals]
       config.externals = [
         (context, request, callback) => {
@@ -53,58 +66,70 @@ const nextConfig = {
       })
     }
 
+    // config.module.rules.unshift({
+    //   test: /.*gyp.*\.html/,
+    //   use: 'null-loader',
+    // })
+    // config.node = {
+    //   fs: 'empty',
+    // } no
+
     const { cssModules, cssLoaderOptions, postcssLoaderOptions, lessLoaderOptions = {} } = nextConfig
 
-    // for all less in clint
-    const baseLessConfig = {
-      extensions: ['less'],
-      cssModules,
-      cssLoaderOptions,
-      postcssLoaderOptions,
-      dev,
-      isServer,
-      loaders: [
-        {
-          loader: 'less-loader',
-          options: lessLoaderOptions,
-        },
-      ],
-    }
+    if (!isServer) {
+      // for all less in clint
+      const baseLessConfig = {
+        extensions: ['less'],
+        cssModules,
+        cssLoaderOptions,
+        postcssLoaderOptions,
+        dev,
+        isServer,
+        loaders: [
+          {
+            loader: 'less-loader',
+            options: lessLoaderOptions,
+          },
+        ],
+      }
 
-    config.module.rules.push({
-      test: /\.less$/,
-      exclude: /node_modules/,
-      use: cssLoaderConfig(config, baseLessConfig),
-    })
-
-    // for antd less in client
-    const antdLessConfig = {
-      ...baseLessConfig,
-      ...{ cssModules: false, cssLoaderOptions: {}, postcssLoaderOptions: {} },
-    }
-
-    config.module.rules.push({
-      test: /\.less$/,
-      include: /node_modules/,
-      use: cssLoaderConfig(config, antdLessConfig),
-    })
-
-    config.plugins.push(
-      new FilterWarningsPlugin({
-        // ignore ANTD chunk styles [mini-css-extract-plugin] warning
-        exclude: /mini-css-extract-plugin[^]*Conflicting order between:/,
+      config.module.rules.push({
+        test: /\.less$/,
+        exclude: /node_modules/,
+        use: cssLoaderConfig(config, baseLessConfig),
       })
-    )
 
-    config.module.rules.push({
-      test: /\.worker\.js$/,
-      loader: 'worker-loader',
-      // options: { inline: true }, // also works
-      options: {
-        name: 'static/[hash].worker.js',
-        publicPath: '/_next/',
-      },
-    })
+      // for antd less in client
+      const antdLessConfig = {
+        ...baseLessConfig,
+        cssModules: false,
+        cssLoaderOptions: {},
+        postcssLoaderOptions: {},
+      }
+
+      config.module.rules.push({
+        test: /\.less$/,
+        include: /node_modules/,
+        use: cssLoaderConfig(config, antdLessConfig),
+      })
+
+      config.plugins.push(
+        new FilterWarningsPlugin({
+          // ignore ANTD chunk styles [mini-css-extract-plugin] warning
+          exclude: /mini-css-extract-plugin[^]*Conflicting order between:/,
+        })
+      )
+
+      config.module.rules.push({
+        test: /\.worker\.js$/,
+        loader: 'worker-loader',
+        // options: { inline: true }, // also works
+        options: {
+          name: 'static/[hash].worker.js',
+          publicPath: '/_next/',
+        },
+      })
+    }
     return config
   },
 
@@ -115,6 +140,8 @@ const nextConfig = {
       '/': { page: '/' },
       '/about': { page: '/about' },
       '/agent': { page: '/agent' },
+      '/login': { page: '/login' },
+      '/signup': { page: '/signup' },
     }
 
     return paths
@@ -125,10 +152,7 @@ const nextConfig = {
   cssLoaderOptions: {
     sourceMap: false,
     importLoaders: 1,
-  },
-  lessLoaderOptions: {
-    javascriptEnabled: true,
-    modifyVars: themeVariables, // make your antd custom effective
+    // localIdentName: '[local]___[hash:base64:5]',
   },
   // offlineConfig,
   generateInDevMode: false,

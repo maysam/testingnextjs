@@ -1,6 +1,5 @@
 import { Layout, Breadcrumb } from 'antd'
 import Sider from './sider'
-import './styles.less'
 
 const { Header: AntHeader, Footer, Sider: AntSider, Content } = Layout
 

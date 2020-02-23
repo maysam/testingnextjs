@@ -4,9 +4,19 @@
 module.exports = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
+  roots: ['<rootDir>'],
+  setupFiles: ['<rootDir>/config/setup.js'],
 
   verbose: true,
   coveragePathIgnorePatterns: ['./lib/'],
+  testPathIgnorePatterns: ['<rootDir>[/\\\\](build|docs|node_modules|.next)[/\\\\]'],
+  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(ts|tsx)$'],
+  testEnvironment: 'jsdom', // 'node'
+  testURL: 'http://localhost',
+  // transform: {
+  //   '^.+\\.(ts|tsx)$': 'babel-jest',
+  // },
+  testRegex: '/__tests__/.*\\.(test|spec)\\.tsx?$',
 
   // collectCoverageFrom: ['**/src/**/*.ts?(x)', '!**/*.d.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
@@ -20,6 +30,9 @@ module.exports = {
       tsConfig: 'tsconfig.jest.json',
     },
   },
+  snapshotSerializers: ['enzyme-to-json/serializer'],
+  watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
+
   // Stop running tests after `n` failures
   // bail: 0,
 
