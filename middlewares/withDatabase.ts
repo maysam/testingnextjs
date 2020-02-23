@@ -8,7 +8,7 @@ const databaseUrl = process.env.MONGODB_URI || ''
 mongoose.Promise = Promise
 mongoose.connect(databaseUrl)
 
-const client = new MongoClient(databaseUrl, { useNewUrlParser: true })
+const client = new MongoClient(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 export type Handler = (req: NextApiRequest & { db: Db }, res: NextApiResponse) => number
 const withDatabase = (handler: Handler) => (req: NextApiRequest & { db: Db }, res: NextApiResponse) => {
   if (!client.isConnected()) {
