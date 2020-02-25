@@ -171,7 +171,7 @@ const Index: NextPage<Props> = ({ userAgent, keyword, shows, total, message }) =
 
 Index.getInitialProps = async ({ req, query: { keyword = 'man' } }) => {
   const userAgent = req ? 'from server ' + req.headers['user-agent'] : 'from client: ' + navigator.userAgent
-  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${keyword || 'keyword'}`
+  const url = `//www.omdbapi.com/?apikey=bcafd89c&s=${keyword || 'keyword'}`
   console.log(`fetching ${url}`)
 
   function checkStatus(res: Response): Response {

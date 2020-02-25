@@ -39,7 +39,7 @@ const PostPAGE: NextPage<POSTS> = props => {
 
 PostPAGE.getInitialProps = async (context: NextPageContext) => {
   const { tag } = context.query
-  const url = `http://www.omdbapi.com/?apikey=bcafd89c&s=${tag}&perpage=3&pagesize=4&page_size=6`
+  const url = `//www.omdbapi.com/?apikey=bcafd89c&s=${tag}&perpage=3&pagesize=4&page_size=6`
   const res = await fetch(url)
   const data = await res.json()
 

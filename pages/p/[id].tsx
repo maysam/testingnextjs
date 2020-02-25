@@ -90,7 +90,7 @@ const Post = (show: DetailedShow) => {
 
 Post.getInitialProps = async (context: NextPageContext) => {
   const { id } = context.query
-  const url = `http://www.omdbapi.com/?apikey=bcafd89c&i=${id}`
+  const url = `//www.omdbapi.com/?apikey=bcafd89c&i=${id}`
   const res = await fetch(url)
   const result = await res.json()
 
