@@ -8,7 +8,10 @@ const databaseUrl = process.env.NEXT_PUBLIC_MONGODB_URI || ''
 
 const client = new MongoClient(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 
-const withDatabase = (handler: Handler) => async (req: NextApiRequest & { db: Db }, res: NextApiResponse) => {
+const withDatabase = (handler: Handler) => async (
+  req: NextApiRequest & { db: Db; dbClient: MongoClient },
+  res: NextApiResponse
+) => {
   mongoose.Promise = Promise
   await mongoose.connect(databaseUrl, { useCreateIndex: true })
   mongoose.set('useCreateIndex', true)
