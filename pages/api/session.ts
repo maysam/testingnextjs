@@ -1,4 +1,4 @@
-import withMiddleware from '../../middlewares/withMiddleware'
+import withMiddleware from 'middlewares/withMiddleware'
 
 const handler = (req, res) => {
   if (req.method === 'GET') {

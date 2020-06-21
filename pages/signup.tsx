@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Router from 'next/router'
-import fetch from 'isomorphic-unfetch'
 import { Formik } from 'formik'
 import { Typography, Divider, Form, Button, Input, Icon, Alert } from 'antd'
 import { UserContext } from '../components/UserContext'
@@ -112,12 +111,16 @@ export default function Signup() {
                     dispatch({ type: 'fetch' })
                     Router.push(isLoggedIn ? '/users' : '/')
                   } else {
+                    console.log({ data })
                     const error = typeof data == 'string' ? data : data.message
                     // .toString()
                     // .split(/[a-zA-Z]\:/)
                     // // .split(': ')
                     // .reverse()[0]
-                    setError(error)
+                    console.log({ error })
+                    if (typeof error === 'string') {
+                      setError(error)
+                    }
                   }
                 })
                 .catch(err => {

@@ -1,26 +1,29 @@
-import React, { createContext, useReducer, useEffect } from 'react'
-import fetch from 'isomorphic-unfetch'
+import React, { ReactNode, createContext, useReducer, useEffect } from 'react'
 import Router from 'next/router'
 
 interface State {
   isLoggedIn: boolean
   user: {
-    name: string
+    name?: string
   }
 }
 
-const reducer = (state: State, action) => {
+const initialState: State = { isLoggedIn: false, user: { name: undefined } }
+
+interface ActionType {
+  type: string
+  data: State
+}
+
+const reducer = (state: State, action: ActionType): State => {
   switch (action.type) {
     case 'state':
       return state
     case 'set':
       return action.data
     case 'clear':
-      return {
-        // ...state,
-        isLoggedIn: false,
-        user: {},
-      }
+    case 'reset':
+      return initialState
     default:
       console.log(action.type + ' action not found!')
       return state
@@ -28,27 +31,26 @@ const reducer = (state: State, action) => {
   }
 }
 
-const initialState: State = { isLoggedIn: false, user: { name: 'hercules' } }
+const defaultDispatch: (action: any) => void | Promise<void> = (): void => {}
 
-interface DispatchType {
-  type: string
-}
+const UserContext = createContext({ state: initialState, dispatch: defaultDispatch })
 
-const defaultDispatch: React.Dispatch<DispatchType> = () => initialState // we never actually use this
-
-const initialUserContext = { state: initialState, dispatch: defaultDispatch }
-
-const UserContext = createContext(initialUserContext)
-
-const UserContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, { isLoggedIn: false, user: {} })
+const UserContextProvider = ({ children }: { children: ReactNode }) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
   const dispatchProxy = action => {
     switch (action.type) {
       case 'fetch':
         return fetch('/api/session')
-          .then(data => data.json())
-          .then((res: Response & { data?: { isLoggedIn: boolean; user: {} } }) => {
-            return res.data || { isLoggedIn: false, user: {} }
+          .then(data => {
+            if (data.ok) {
+              return data.json()
+            } else {
+              console.log({ data: data.body })
+              throw data
+            }
+          })
+          .then((res: Response & { data?: State }) => {
+            return res.data || initialState
           })
           .then(({ isLoggedIn, user }) => {
             dispatch({
@@ -66,7 +68,7 @@ const UserContextProvider = ({ children }) => {
           .then(data => data.json())
           .then(data => {
             if (data.status === 'ok') {
-              dispatch({ type: 'clear' })
+              dispatch({ type: 'clear', data: initialState })
               Router.push('/')
             }
           })

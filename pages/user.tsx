@@ -1,6 +1,5 @@
 import { NextPage } from 'next'
 import Link from 'next/link'
-// import fetch from 'isomorphic-unfetch'
 import { Empty, Table } from 'antd'
 
 import { User } from '../types'

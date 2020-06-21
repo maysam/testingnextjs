@@ -1,5 +1,5 @@
-import withMiddleware from '../../../middlewares/withMiddleware'
-import User from '../../../models/userModel'
+import withMiddleware from 'middlewares/withMiddleware'
+import User from 'models/userModel'
 import { ObjectId } from 'mongodb'
 
 const handler = (req, res) => {

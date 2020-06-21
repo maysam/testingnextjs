@@ -30,6 +30,7 @@ module.exports = {
     'react/prop-types': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
+    'react/prop-types': 'off'
   },
   settings: {
     react: {

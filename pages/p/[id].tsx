@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import fetch from 'isomorphic-unfetch'
 import { NextPageContext } from 'next'
 import { Tag } from 'antd'
 
@@ -90,7 +89,7 @@ const Post = (show: DetailedShow) => {
 
 Post.getInitialProps = async (context: NextPageContext) => {
   const { id } = context.query
-  const url = `//www.omdbapi.com/?apikey=bcafd89c&i=${id}`
+  const url = `http://www.omdbapi.com/?apikey=bcafd89c&i=${id}`
   const res = await fetch(url)
   const result = await res.json()
 

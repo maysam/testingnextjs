@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const fs = require('fs')
 const path = require('path')
 
@@ -8,11 +6,12 @@ const lessToJS = require('less-vars-to-js')
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 
 const withOffline = require('next-offline')
-const analyzer = require('@next/bundle-analyzer')
 
-const withBundleAnalyzer = analyzer({
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
+const { WebpackBundleSizeAnalyzerPlugin } = require('webpack-bundle-size-analyzer')
+const { ANALYZE } = process.env
 
 // Where your antd-custom.less file lives
 const themeVariables = lessToJS(fs.readFileSync(path.resolve(__dirname, './assets/antd-custom.less'), 'utf8'))
@@ -28,6 +27,10 @@ const nextConfig = {
     modifyVars: themeVariables, // make your antd custom effective
   },
   webpack(config, options) {
+    if (ANALYZE) {
+      config.plugins.push(new WebpackBundleSizeAnalyzerPlugin('stats.txt'))
+    }
+
     if (!options.defaultLoaders) {
       throw new Error(
         'This plugin is not compatible with Next.js versions below 5.0.0 https://err.sh/next-plugins/upgrade'
@@ -77,7 +80,7 @@ const nextConfig = {
     const { cssModules, cssLoaderOptions, postcssLoaderOptions, lessLoaderOptions = {} } = nextConfig
 
     if (!isServer) {
-      // for all less in clint
+      // for all less in client
       const baseLessConfig = {
         extensions: ['less'],
         cssModules,
@@ -120,6 +123,14 @@ const nextConfig = {
         })
       )
 
+      // config.node = {
+      //   ...(config.node || {}),
+      //   fs: 'empty',
+      //   net: 'empty',
+      //   module: 'empty',
+      //   tls: 'empty',
+      //   dns: 'empty',
+      // }
       config.module.rules.push({
         test: /\.worker\.js$/,
         loader: 'worker-loader',
@@ -136,15 +147,13 @@ const nextConfig = {
   poweredByHeader: false,
   exportTrailingSlash: true,
   exportPathMap: () => {
-    const paths = {
+    return {
       '/': { page: '/' },
       '/about': { page: '/about' },
       '/agent': { page: '/agent' },
       '/login': { page: '/login' },
       '/signup': { page: '/signup' },
     }
-
-    return paths
   },
   target: 'serverless',
   // antd config
@@ -212,11 +221,6 @@ const nextConfig = {
         },
       ]
     },
-  },
-  env: {
-    TEST_VAR1: process.env.TEST_VAR1,
-    TEST_VAR2: process.env.TEST_VAR2,
-    MONGODB_URI: process.env.MONGODB_URI,
   },
 }
 

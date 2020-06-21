@@ -1,23 +1,24 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { MongoClient, Db } from 'mongodb'
-
 import mongoose from 'mongoose'
 
-const databaseUrl = process.env.MONGODB_URI || ''
+export type Handler = (req: NextApiRequest & { db: Db; dbClient: MongoClient }, res: NextApiResponse) => number
 
-mongoose.Promise = Promise
-mongoose.connect(databaseUrl)
+const databaseUrl = process.env.NEXT_PUBLIC_MONGODB_URI || ''
 
 const client = new MongoClient(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true })
-export type Handler = (req: NextApiRequest & { db: Db }, res: NextApiResponse) => number
-const withDatabase = (handler: Handler) => (req: NextApiRequest & { db: Db }, res: NextApiResponse) => {
+
+const withDatabase = (handler: Handler) => async (req: NextApiRequest & { db: Db }, res: NextApiResponse) => {
+  mongoose.Promise = Promise
+  await mongoose.connect(databaseUrl, { useCreateIndex: true })
+  mongoose.set('useCreateIndex', true)
+
   if (!client.isConnected()) {
-    return client.connect().then(() => {
-      req.db = client.db() as Db
-      return handler(req, res)
-    })
+    await client.connect({ useNewUrlParser: true })
   }
-  req.db = client.db()
+
+  req.dbClient = client
+  req.db = client.db() as Db
   return handler(req, res)
 }
 export default withDatabase

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react'
 import Router from 'next/router'
-import fetch from 'isomorphic-unfetch'
 import { Formik } from 'formik'
 import { Divider, Form, Button, Input, Icon, Alert } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'

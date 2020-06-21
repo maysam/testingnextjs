@@ -1,12 +1,16 @@
 import Link from 'next/link'
-import fetch from 'isomorphic-unfetch'
 import { Table } from 'antd'
-import { User } from '../types'
+import { User } from 'types'
+import useSWR from 'swr'
+
+const fetcher = url => fetch(url).then(r => r.json())
 
 type Users = User[]
 
 interface Props {
+  status?: string
   users?: Users
+  count?: integer
 }
 
 const stringSorter = field => (a, b) =>
@@ -23,7 +27,7 @@ const columns = [
     title: 'ID',
     dataIndex: 'self',
     key: 'id',
-    render: text => (text && <strong>You</strong>) || <small>Others</small>,
+    render: text => (text ? <strong>You</strong> : <small>Others</small>),
   },
   {
     title: 'Name',
@@ -52,33 +56,26 @@ const columns = [
   },
 ]
 
-const AllUsers = ({ users }: Props) => (
+const AllUsersTable = ({ users, loading }: Props) => (
   <Table
     bordered
     pagination={{ pageSize: 50, position: 'both' }}
-    loading={!users}
+    loading={loading}
     dataSource={users && users.reverse()}
     columns={columns}
     rowKey="_id"
   />
 )
 
-AllUsers.getInitialProps = ({ req }) => {
+function AllUsers({ path, url }) {
+  const { data, error, isValidating } = useSWR(path, fetcher)
+  console.log({ isValidating, data, path, url })
+  return AllUsersTable({ ...data, loading: isValidating })
+}
+
+export function getServerSideProps({ req, res }) {
   const path = '/api/users'
   const url = req == undefined ? path : 'http://' + req.headers['host'] + path
-
-  // return fetch(url, {
-  //   method: 'GET',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     // cookie: req && req.session.userId,
-  //   },
-  // })
-
-  return fetch(url)
-    .then(data => data.json())
-    .catch(err => {
-      console.warn({ err })
-    })
+  return { props: { path, url } }
 }
 export default AllUsers

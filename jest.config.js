@@ -25,6 +25,13 @@ module.exports = {
     '^.+\\.(ts|tsx)$': 'ts-jest',
     '^.+\\.jsx?$': 'babel-jest',
   },
+
+  // watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
+  // moduleNameMapper: {
+  //   '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
+  //   '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
+  // },
+
   globals: {
     'ts-jest': {
       tsConfig: 'tsconfig.jest.json',
