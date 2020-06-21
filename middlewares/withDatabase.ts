@@ -14,7 +14,7 @@ const withDatabase = (handler: Handler) => async (req: NextApiRequest & { db: Db
   mongoose.set('useCreateIndex', true)
 
   if (!client.isConnected()) {
-    await client.connect({ useNewUrlParser: true })
+    await client.connect()
   }
 
   req.dbClient = client
