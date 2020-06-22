@@ -1,7 +1,7 @@
 import { applySession, promisifyStore, expressSession } from 'next-session'
 import connectMongo from 'connect-mongo'
 
-import { Handler } from './withDatabase'
+import { Handler } from 'middlewares/withDatabase'
 
 const withMongoSession = (handler: Handler) => async (req, res) => {
   const MongoStore = connectMongo(expressSession)

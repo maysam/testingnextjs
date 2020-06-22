@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Router from 'next/router'
-import fetch from 'node-fetch'
 import { Formik } from 'formik'
 import { Typography, Divider, Form, Button, Input, Icon, Alert } from 'antd'
 import { UserContext } from '../../components/UserContext'
@@ -8,11 +7,11 @@ import { isValidIranianNationalCode } from '../../lib/validations'
 
 const { Title } = Typography
 
-const User = ({ uid, user }) => {
+const User = ({ user }) => {
   if (!user || user.name === undefined) {
-    return <div>reouter query id = {uid}</div>
+    return <div>Cannot find user corresponding to id {user._id}</div>
   }
-
+  const uid = user._id
   const {
     dispatch,
     state: { isLoggedIn },
@@ -75,17 +74,16 @@ const User = ({ uid, user }) => {
               }
               setSubmitting(false)
             } else {
-              console.log('patching')
-              const x = fetch('/api/users', {
-                method: 'POST',
+              values.uid = uid
+              return fetch('/api/users', {
+                method: 'PATCH',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(values.merge({ uid })),
+                body: JSON.stringify(values),
               })
                 .then(data => (data.statusText == 'Internal Server Error' ? data.statusText : data.json()))
                 .then(data => {
-                  setSubmitting(false)
                   if (data.status === 'ok') {
                     dispatch({ type: 'fetch' })
                     Router.push(isLoggedIn ? '/users' : '/')
@@ -95,6 +93,7 @@ const User = ({ uid, user }) => {
                     // .split(/[a-zA-Z]\:/)
                     // // .split(': ')
                     // .reverse()[0]
+                    setSubmitting(false)
                     setError(error)
                   }
                 })
@@ -102,8 +101,6 @@ const User = ({ uid, user }) => {
                   console.warn({ err })
                   setSubmitting(false)
                 })
-              console.log('after patching')
-              console.log({ x })
             }
           })
         }}
@@ -197,6 +194,7 @@ const User = ({ uid, user }) => {
                   prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />}
                   type="email"
                   name="email"
+                  autoComplete="email"
                   placeholder="Email"
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -204,7 +202,7 @@ const User = ({ uid, user }) => {
               )}
             </Form.Item>
 
-            <span>Leave empty if you don't want to change it.</span>
+            <span>Leave empty if you don&#39;t want to change it.</span>
             <Form.Item label="Password" hasFeedback>
               {getFieldDecorator('password', {
                 validateFirst: true,
@@ -224,6 +222,7 @@ const User = ({ uid, user }) => {
                   prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                   type="password"
                   name="password"
+                  autoComplete="new-password"
                   placeholder="password"
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -246,18 +245,19 @@ const User = ({ uid, user }) => {
   return <Wrapped />
 }
 
-User.getInitialProps = context => {
-  const { query, req } = context
+export function getServerSideProps({ query, req }) {
   const { uid } = query
-
   const path = `/api/user/${uid}`
   const url = req == undefined ? path : 'http://' + req.headers['host'] + path
 
   return fetch(url)
     .then(res => res.json())
+    .then(props => {
+      return { props }
+    })
     .catch(error => {
       console.log({ error })
-      return { uid, user: { _id: '1', name: 'none' } }
+      return { props: { user: { _id: uid } } }
     })
 }
 

@@ -1,6 +1,6 @@
-import withDatabase, { Handler } from './withDatabase'
-import withAuthentication from './withAuthentication'
-import withSession from './withSession'
+import withDatabase, { Handler } from 'middlewares/withDatabase'
+import withAuthentication from 'middlewares/withAuthentication'
+import withSession from 'middlewares/withSession'
 
 const middleware = (handler: Handler) => withDatabase(withSession(withAuthentication(handler)))
 

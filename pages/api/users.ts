@@ -159,87 +159,107 @@ const handler = (req, res) => {
           message: 'Whose profile info are you trying to update?',
         })
       }
-      if (email) {
-        promises.push(
-          new Promise((resolve, reject) => {
-            if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
-              reject('Email address is invalid.')
-            } else
-              User.countDocuments({ email }).then(emailCount => {
-                if (emailCount) {
-                  reject('The email has already been used.')
-                } else {
-                  resolve()
+
+      return User.findOne({ _id: new ObjectId(uid) })
+        .then(user => {
+          if (email) {
+            promises.push(
+              new Promise((resolve, reject) => {
+                if (email === user.email) {
+                  return resolve()
                 }
+                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
+                  reject('Email address is invalid.')
+                } else
+                  User.countDocuments({ email }).then(emailCount => {
+                    if (emailCount) {
+                      reject('The email has already been used.')
+                    } else {
+                      resolve()
+                    }
+                  })
               })
-          })
-        )
-      }
-      if (mobile) {
-        promises.push(
-          new Promise((resolve, reject) => {
-            User.countDocuments({ mobile }).then(mobileCount => {
-              if (mobileCount) {
-                reject('Mobile number has already been used.')
-              } else {
-                resolve()
-              }
-            })
-          })
-        )
-      }
-      if (nid) {
-        promises.push(
-          new Promise((resolve, reject) => {
-            User.countDocuments({ nid }).then(nidCount => {
-              if (nidCount) {
-                reject('National ID has already been used.')
-              } else {
-                resolve()
-              }
-            })
-          })
-        )
-      }
+            )
+          }
+          if (mobile) {
+            promises.push(
+              new Promise((resolve, reject) => {
+                if (mobile === user.mobile) {
+                  return resolve()
+                }
+                User.countDocuments({ mobile }).then(mobileCount => {
+                  if (mobileCount) {
+                    reject('Mobile number has already been used.')
+                  } else {
+                    resolve()
+                  }
+                })
+              })
+            )
+          }
+          if (nid) {
+            promises.push(
+              new Promise((resolve, reject) => {
+                if (nid === user.nid) {
+                  return resolve()
+                }
+                User.countDocuments({ nid }).then(nidCount => {
+                  if (nidCount) {
+                    reject('National ID has already been used.')
+                  } else {
+                    resolve()
+                  }
+                })
+              })
+            )
+          }
 
-      if (promises.length == 0) {
-        return res.send({
-          status: 'error',
-          message: 'Please enter at least one of the Email Address, Mobile Number, or National ID.',
-        })
-      }
-
-      return Promise.all(promises).then(async () => {
-        User.findOne({ _id: new ObjectId(uid) })
-          // .then(data => data.json())
-          .then(user => {
-            console.log(user)
-            if (email) user.email = email
-            if (nid) {
-              user.nid = nid
-            }
-            if (mobile) {
-              user.mobile = mobile
-            }
-            removeUndefined(user)
-            user.save()
-
-            res.status(201).send({
-              status: 'ok',
-              type: 'updating',
-              message: 'User saved successfully',
-            })
-          })
-          .catch(error => {
-            // schema validation errors come here
-            console.log(error)
-            res.send({
-              place: 'internal',
+          if (promises.length == 0) {
+            return res.send({
               status: 'error',
-              message: error.errmsg || error.toString(),
+              message: 'Please enter at least one of the Email Address, Mobile Number, or National ID.',
             })
+          }
+
+          return Promise.all(promises)
+            .then(async () => {
+              if (name) user.name = name
+              if (email) user.email = email
+              if (nid) user.nid = nid
+              if (mobile) user.mobile = mobile
+              removeUndefined(user)
+              if (password) {
+                argon2.hash(password).then(hashedPassword => {
+                  user.password = hashedPassword
+                  user.save()
+                })
+              } else {
+                user.save()
+              }
+
+              return res.status(201).send({
+                status: 'ok',
+                type: 'updating',
+                message: 'User saved successfully',
+              })
+            })
+            .catch(error => {
+              console.log({ error })
+              res.send({
+                status: 'error',
+                message: error,
+              })
+            })
+        })
+        .catch(error => {
+          // schema validation errors come here
+          console.log(error)
+          res.send({
+            place: 'internal',
+            status: 'error',
+            message: error.errmsg || error.toString(),
           })
-      })
+        })
       break
     default:
       return res.status(405).end()
