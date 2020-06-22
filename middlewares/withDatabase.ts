@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { MongoClient, Db } from 'mongodb'
 import mongoose from 'mongoose'
 
-export type Handler = (req: NextApiRequest & { db: Db; dbClient: MongoClient }, res: NextApiResponse) => number
+export type Handler = (req: NextApiRequest & { db: Db; dbClient: MongoClient }, res: NextApiResponse) => Promise<number>
 
 const databaseUrl = process.env.NEXT_PUBLIC_MONGODB_URI || ''
 

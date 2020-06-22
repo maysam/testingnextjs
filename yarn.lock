@@ -10270,7 +10270,7 @@ next-server@*:
     styled-jsx "3.2.1"
     url "0.11.0"
 
-next-session@^3.2.0:
+next-session@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/next-session/-/next-session-3.2.3.tgz#23b4a4cd23f18dafe64ffb8f2ee438287b231e03"
   integrity sha512-7uM9GG60b1WxfE82szImVAcdYiWFnsas4W2ppwEiTyA3D6lEDfMcfKwG/q1jRnf6pYCnKrTOaCUObitYouUXRQ==

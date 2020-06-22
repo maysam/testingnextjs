@@ -10,7 +10,8 @@ type Users = User[]
 interface Props {
   status?: string
   users?: Users
-  count?: integer
+  count?: number
+  loading?: boolean
 }
 
 const stringSorter = field => (a, b) =>
@@ -70,10 +71,10 @@ const AllUsersTable = ({ users, loading }: Props) => (
 function AllUsers({ path, url }) {
   const { data, error, isValidating } = useSWR(path, fetcher)
   console.log({ isValidating, data, path, url })
-  return AllUsersTable({ ...data, loading: isValidating })
+  return AllUsersTable({ ...data, loading: isValidating, error })
 }
 
-export function getServerSideProps({ req, res }) {
+export function getServerSideProps({ req }) {
   const path = '/api/users'
   const url = req == undefined ? path : 'http://' + req.headers['host'] + path
   return { props: { path, url } }
