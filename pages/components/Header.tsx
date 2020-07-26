@@ -78,7 +78,7 @@ export default function Header({ active }) {
       )}
       <Menu.Item key="About">
         <Link href="/about">
-          <a>
+          <a href="/about">
             <InfoCircleOutlined />
             About
           </a>
@@ -99,7 +99,7 @@ export default function Header({ active }) {
         <Menu.ItemGroup title="Examples">
           <Menu.Item key="Conditional">
             <Link href="/conditional">
-              <a>Conditional</a>
+              <a href="/conditional">Conditional</a>
             </Link>
           </Menu.Item>
           <Menu.Item key="Hook">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import Router from 'next/router'
 import { Typography, Divider, Form, Button, Input, Alert } from 'antd'
 import {
@@ -24,19 +24,6 @@ export default function Signup() {
   const [isSubmitting, setSubmitting] = useState(false)
   const [needOne, setOne] = useState<boolean>(true)
   const [form] = Form.useForm()
-
-  const values = form.getFieldsValue()
-  const AllIsEmpty = !values.email && !values.nid && !values.mobile
-  if (AllIsEmpty != needOne) {
-    setOne(AllIsEmpty)
-  }
-
-  useEffect(() => {
-    if (form.isFieldsTouched()) {
-      // don't validate on startup
-      form.validateFields(['name', 'email', 'mobile', 'nid', 'password'])
-    }
-  }, [needOne])
 
   const formItemLayout = {
     labelCol: {
@@ -65,45 +52,20 @@ export default function Signup() {
   return (
     <Form
       form={form}
-      initialValues={{
-        name: '',
-        mobile: '',
-        nid: '',
-        email: '',
-        password: '',
+      onValuesChange={(_, values) => {
+        const oneIsSet = values.email || values.nid || values.mobile
+        setOne(!oneIsSet)
       }}
-      // validate={values => {
-      //   console.log({ validating: values })
-      //   // const AllIsEmpty = !values.email && !values.nid && !values.mobile
-      //   // setOne(AllIsEmpty)
-
-      //   validateFields(
-      //     (err, values) => {
-      //       // const AllIsEmpty = !values.email && !values.nid && !values.mobile
-      //       // setOne(AllIsEmpty)
-      //       console.log({ err, values })
-      //       if (err) {
-      //         if (err[values.method]) {
-      //           setError(err[values.method].errors[0].message)
-      //         } else if (err['password']) {
-      //           setError(err['password'].errors[0].message)
-      //         }
-      //         return err
-      //       } else {
-      //         setError(null)
-      //       }
-      //     },
-      //     { force: true, first: true }
-      //   )
-      // }}
-      onFinishFailed={err => {
-        console.log({ err })
-        if (err[values.method]) {
-          setError(err[values.method].errors[0].message)
-        } else if (err['password']) {
-          setError(err['password'].errors[0].message)
-        }
-        setSubmitting(false)
+      onFinishFailed={({ errorFields, values: { method } }) => {
+        errorFields.forEach(errorField => {
+          if (errorField.name[0] === method) {
+            setError(errorField.errors[0])
+          }
+          if (errorField.name[0] === 'password') {
+            setError(errorField.errors[0])
+          }
+          setSubmitting(false)
+        })
       }}
       onFinish={values => {
         setSubmitting(true)
@@ -134,7 +96,7 @@ export default function Signup() {
             }
           })
           .catch(err => {
-            console.warn({ err })
+            console.warn({ err, x: 2 })
             setSubmitting(false)
           })
       }}
@@ -148,7 +110,7 @@ export default function Signup() {
         hasFeedback
         name="name"
         validateFirst
-        rules={[{ whitespace: true }, { required: true, message: 'Please input your name!' }]}
+        rules={[{ whitespace: true }, { required: needOne, message: 'Please input your name!' }]}
       >
         <Input
           prefix={

@@ -74,17 +74,17 @@ class About extends React.Component {
           >
             <div style={{ width: 'fit-content', margin: 'auto 0px' }}>
               <Link href="/">
-                <a>Home</a>
+                <a href="/">Home</a>
               </Link>
             </div>
             <div style={{ width: 'fit-content', margin: 'auto 0px' }}>
               <Link href="/">
-                <a>Product</a>
+                <a href="/">Product</a>
               </Link>
             </div>
             <div style={{ width: 'fit-content', margin: 'auto 0px' }}>
               <Link href="/about">
-                <a>About us</a>
+                <a href="/about">About us</a>
               </Link>
             </div>
           </Col>

@@ -33,7 +33,7 @@ function Error(props: { statusCode: number }) {
                   <div className="button-4">
                     <div className="eff-4"></div>
                     <Link href="/" replace={true}>
-                      <a>Back To Home</a>
+                      <a href="/">Back To Home</a>
                     </Link>
                   </div>
                 </div>
