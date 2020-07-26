@@ -1,14 +1,7 @@
 import React, { useState, useContext } from 'react'
 import Router from 'next/router'
-import { Radio, Form, Button, Input, Icon, Alert } from 'antd'
-import {
-  SmileOutlined,
-  UserOutlined,
-  MobileOutlined,
-  IdcardOutlined,
-  MailOutlined,
-  LockOutlined,
-} from '@ant-design/icons'
+import { Radio, Form, Button, Input, Alert } from 'antd'
+import { MobileOutlined, IdcardOutlined, MailOutlined, LockOutlined } from '@ant-design/icons'
 
 import { UserContext } from '../components/UserContext'
 import { isValidIranianNationalCode } from '../lib/validations'
@@ -102,7 +95,6 @@ export default function Login() {
           hasFeedback
           name="email"
           validateFirst
-          type="mail"
           rules={[
             { required: true, message: 'Please enter your Email address!' },
             {
@@ -113,7 +105,6 @@ export default function Login() {
         >
           <Input
             prefix={<MailOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
-            type="email"
             placeholder="Email"
             autoComplete="email"
           />
@@ -130,11 +121,7 @@ export default function Login() {
             { pattern: /^(\+98|0)?9\d{9}$/, message: 'Invalid Mobile Number Format' },
           ]}
         >
-          <Input
-            prefix={<Icon type="mobile" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            autoComplete="mobile"
-            placeholder="Mobile Number"
-          />
+          <Input prefix={<MobileOutlined />} autoComplete="mobile" placeholder="Mobile Number" />
         </Form.Item>
       )}
       {method == 'nid' && (
@@ -150,9 +137,9 @@ export default function Login() {
               message: 'National ID number should be 10 digits long',
             },
             {
-              asyncValidator: (_, value) => {
+              validator: (_, value) => {
                 return new Promise((resolve, reject) => {
-                  if (isValidIranianNationalCode(value)) {
+                  if (!value || isValidIranianNationalCode(value)) {
                     resolve()
                   } else {
                     reject('Invalid National ID format') // can reject with error message
@@ -161,20 +148,9 @@ export default function Login() {
               },
               // message: 'Invalid National ID number',
             },
-            {
-              // if asyncValidator is not acceptable
-              validator: (_, value, callback) => {
-                if (!value || isValidIranianNationalCode(value)) {
-                  callback()
-                } else {
-                  callback('Invalid National ID format') // can reject with error message
-                }
-              },
-              // message: 'Invalid National ID number',
-            },
           ]}
         >
-          <Input prefix={<Icon type="idcard" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="National ID" />
+          <Input prefix={<IdcardOutlined />} placeholder="National ID" />
         </Form.Item>
       )}
       <Form.Item
@@ -195,7 +171,7 @@ export default function Login() {
         ]}
       >
         <Input.Password
-          prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+          prefix={<LockOutlined />}
           type="password"
           autoComplete="current-password"
           placeholder="password"

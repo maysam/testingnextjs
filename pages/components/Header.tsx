@@ -1,6 +1,17 @@
 import React, { useContext } from 'react'
 import Link from 'next/link'
-import { Menu, Icon } from 'antd'
+import { Menu } from 'antd'
+import {
+  HomeOutlined,
+  UserAddOutlined,
+  UsergroupAddOutlined,
+  LoginOutlined,
+  FormOutlined,
+  InfoCircleOutlined,
+  CompassOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons'
 
 import { UserContext } from '../../components/UserContext'
 
@@ -19,8 +30,8 @@ export default function Header({ active }) {
     <Menu mode="horizontal" selectedKeys={[active]}>
       <Menu.Item key="Index">
         <Link href="/">
-          <a>
-            <Icon type="home" />
+          <a href="/">
+            <HomeOutlined />
             {isLoggedIn ? 'Hello ' + name : 'Home'}
           </a>
         </Link>
@@ -28,8 +39,8 @@ export default function Header({ active }) {
       {isLoggedIn && (
         <Menu.Item key="AddUser">
           <Link href="/adduser">
-            <a>
-              <Icon type="user-add" />
+            <a href="/adduser">
+              <UserAddOutlined />
               Add User
             </a>
           </Link>
@@ -38,8 +49,8 @@ export default function Header({ active }) {
       {isLoggedIn && (
         <Menu.Item key="AllUsers">
           <Link href="/users">
-            <a>
-              <Icon type="user" />
+            <a href="/users">
+              <UsergroupAddOutlined />
               All Users
             </a>
           </Link>
@@ -48,8 +59,8 @@ export default function Header({ active }) {
       {!isLoggedIn && (
         <Menu.Item key="Login">
           <Link href="/login">
-            <a>
-              <Icon type="login" />
+            <a href="/login">
+              <LoginOutlined />
               Login
             </a>
           </Link>
@@ -58,8 +69,8 @@ export default function Header({ active }) {
       {!isLoggedIn && (
         <Menu.Item key="SignUp">
           <Link href="/signup">
-            <a>
-              <Icon type="plus-square" />
+            <a href="/signup">
+              <FormOutlined />
               Sign Up
             </a>
           </Link>
@@ -68,19 +79,19 @@ export default function Header({ active }) {
       <Menu.Item key="About">
         <Link href="/about">
           <a>
-            <Icon type="info-circle" />
+            <InfoCircleOutlined />
             About
           </a>
         </Link>
       </Menu.Item>
       <Menu.Item key="/Compass" disabled>
-        <Icon type="compass" />
+        <CompassOutlined />
         Coming Soon
       </Menu.Item>
       <SubMenu
         title={
           <span className="submenu-title-wrapper">
-            <Icon type="setting" />
+            <SettingOutlined />
             Has Submenu
           </span>
         }
@@ -93,7 +104,7 @@ export default function Header({ active }) {
           </Menu.Item>
           <Menu.Item key="Hook">
             <Link href="/hook">
-              <a>Hook</a>
+              <a href="/hook">Hook</a>
             </Link>
           </Menu.Item>
         </Menu.ItemGroup>
@@ -104,7 +115,7 @@ export default function Header({ active }) {
       </SubMenu>
       {isLoggedIn && (
         <Menu.Item key="logout" onClick={() => dispatch({ type: 'logout' })}>
-          <Icon type="logout" />
+          <LogoutOutlined />
           Logout
         </Menu.Item>
       )}

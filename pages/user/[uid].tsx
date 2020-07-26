@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Router from 'next/router'
-import { Typography, Divider, Form, Button, Input, Icon, Alert } from 'antd'
+import { Typography, Divider, Form, Button, Input, Alert } from 'antd'
 import {
   SmileOutlined,
   UserOutlined,
@@ -38,7 +38,7 @@ const User = ({ user }) => {
   useEffect(() => {
     if (form.isFieldsTouched()) {
       // don't validate on startup
-      form.validateFields(['name', 'email', 'mobile', 'nid', 'password'], { force: true })
+      form.validateFields(['name', 'email', 'mobile', 'nid', 'password'])
     }
   }, [needOne])
 
@@ -70,13 +70,16 @@ const User = ({ user }) => {
     <Form
       form={form}
       initialValues={user}
-      onFinishFailed={({ values, errorFields, outOfDate }) => {
-        console.log('there is error', values, errorFields, outOfDate)
-        if (err[values.method]) {
-          setError(err[values.method].errors[0].message)
-        } else if (err['password']) {
-          setError(err['password'].errors[0].message)
-        }
+      onFinishFailed={({ values, errorFields }) => {
+        console.log(errorFields, values)
+        errorFields.forEach(errorField => {
+          if (errorField.name[0] === values.method) {
+            setError(errorField.errors[0])
+          }
+          if (errorField.name[0] === 'password') {
+            setError(errorField.errors[0])
+          }
+        })
         setSubmitting(false)
       }}
       onFinish={values => {
@@ -119,17 +122,14 @@ const User = ({ user }) => {
         hasFeedback
         name="name"
         validateFirst
-        whitespace
-        rules={[{ required: true, message: 'Please input your name!' }]}
+        rules={[{ whitespace: true }, { required: true, message: 'Please input your name!' }]}
       >
         <Input
           prefix={
             <>
               <SmileOutlined />
-              <SmileOutlined twoToneColor />
               <SmileOutlined spin />
               <UserOutlined />
-              <Icon type="smile" style={{ color: 'rgba(0,0,0,.25)' }} />
             </>
           }
           placeholder="Name"
@@ -141,63 +141,48 @@ const User = ({ user }) => {
         name="mobile"
         // normalize: normalizeIranianMobileNumbers
         validateFirst
-        whitespace
         rules={[
+          { whitespace: true },
           { required: needOne, message: 'Please input your mobile number!' },
           { pattern: /^(\+98|0)?9\d{9}$/, message: 'Invalid Mobile Number Format' },
         ]}
       >
-        <Input
-          prefix={
-            <>
-              <MobileOutlined />
-              <Icon type="mobile" style={{ color: 'rgba(0,0,0,.25)' }} />
-            </>
-          }
-          placeholder="Mobile Number"
-        />
+        <Input prefix={<MobileOutlined />} placeholder="Mobile Number" />
       </Form.Item>
       <Form.Item
         label="National ID"
         hasFeedback
         name="nid"
         validateFirst
-        whitespace
         rules={[
+          { whitespace: true },
           { required: needOne, message: 'Please input your national ID number!' },
           {
             len: 10,
             message: 'National ID number should be 10 digits long',
           },
           {
-            validator: (_, value, callback) => {
-              if (!value || isValidIranianNationalCode(value)) {
-                callback()
-              } else {
-                callback('error message') // can reject with error message
-              }
+            validator: (_, value) => {
+              return new Promise((resolve, reject) => {
+                if (!value || isValidIranianNationalCode(value)) {
+                  resolve()
+                } else {
+                  reject('Invalid National ID number') // can reject with error message
+                }
+              })
             },
-            message: 'Invalid National ID number',
           },
         ]}
       >
-        <Input
-          prefix={
-            <>
-              <IdcardOutlined />
-              <Icon type="idcard" style={{ color: 'rgba(0,0,0,.25)' }} />
-            </>
-          }
-          placeholder="National ID"
-        />
+        <Input prefix={<IdcardOutlined />} placeholder="National ID" />
       </Form.Item>
       <Form.Item
         label="Email Address"
         hasFeedback
         name="email"
         validateFirst
-        whitespace
         rules={[
+          { whitespace: true },
           { required: needOne, message: 'Please enter your email address' },
           {
             type: 'email',
@@ -208,19 +193,8 @@ const User = ({ user }) => {
           //   message: 'Invalid Email format 2',
           // },
         ]}
-        type="email"
       >
-        <Input
-          prefix={
-            <>
-              <MailOutlined />
-              <Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />
-            </>
-          }
-          type="email"
-          name="email"
-          placeholder="Email"
-        />
+        <Input prefix={<MailOutlined />} type="email" name="email" placeholder="Email" />
       </Form.Item>
 
       <span>Leave empty if you don&#39;t want to change it.</span>
@@ -229,8 +203,8 @@ const User = ({ user }) => {
         hasFeedback
         name="password"
         validateFirst
-        whitespace
         rules={[
+          { whitespace: true },
           {
             min: 6,
             message: 'Minimum 6 characters',

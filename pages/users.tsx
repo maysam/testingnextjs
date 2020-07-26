@@ -60,7 +60,7 @@ const columns = [
 const AllUsersTable = ({ users, loading }: Props) => (
   <Table
     bordered
-    pagination={{ pageSize: 50, position: 'both' }}
+    pagination={{ pageSize: 50, position: ['bottomCenter'] }}
     loading={loading}
     dataSource={users && users.reverse()}
     columns={columns}

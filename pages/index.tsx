@@ -2,7 +2,8 @@ import React, { useContext } from 'react'
 import { UserContext } from '../components/UserContext'
 import { NextPage } from 'next'
 import Link from 'next/link'
-import { Alert, Divider, List, Form, Icon, Input, Button, Empty } from 'antd'
+import { Alert, Divider, List, Form, Input, Button, Empty } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 
 interface POST {
   title: string
@@ -92,7 +93,7 @@ const Index: NextPage<Props> = ({ userAgent, keyword, shows, total, message }) =
             </Link>
           </div>
         ) : (
-          <Button onClick={() => dispatch({ type: 'logout' })} type="danger">
+          <Button onClick={() => dispatch({ type: 'logout' })} danger>
             Logout
           </Button>
         )}
@@ -101,14 +102,9 @@ const Index: NextPage<Props> = ({ userAgent, keyword, shows, total, message }) =
       <Blog />
 
       <Divider />
-      <Form layout="inline" onSubmit={() => true}>
+      <Form layout="inline" onFinish={() => true}>
         <Form.Item>
-          <Input
-            name="keyword"
-            prefix={<Icon type="search" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            placeholder="keyword"
-            defaultValue={keyword}
-          />
+          <Input name="keyword" prefix={<SearchOutlined />} placeholder="keyword" defaultValue={keyword} />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">

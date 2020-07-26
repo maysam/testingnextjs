@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Menu, Icon, Switch } from 'antd'
+import { Menu, Switch } from 'antd'
+import { MailOutlined, CalendarOutlined, AppleOutlined, SettingOutlined } from '@ant-design/icons'
 
 const { SubMenu } = Menu
 
@@ -26,19 +27,17 @@ export default function Sider() {
       <br />
       <br />
       <Menu defaultSelectedKeys={['1']} defaultOpenKeys={['sub1']} mode={mode} theme={theme}>
-        <Menu.Item key="1">
-          <Icon type="mail" />
+        <Menu.Item key="1" icon={<MailOutlined />}>
           Navigation One
         </Menu.Item>
-        <Menu.Item key="2">
-          <Icon type="calendar" />
+        <Menu.Item key="2" icon={<CalendarOutlined />}>
           Navigation Two
         </Menu.Item>
         <SubMenu
           key="sub1"
           title={
             <span>
-              <Icon type="appstore" />
+              <AppleOutlined />
               <span>Navigation Three</span>
             </span>
           }
@@ -54,7 +53,7 @@ export default function Sider() {
           key="sub2"
           title={
             <span>
-              <Icon type="setting" />
+              <SettingOutlined />
               <span>Navigation Four</span>
             </span>
           }

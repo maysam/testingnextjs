@@ -1,5 +1,16 @@
-import { Button, Modal, Breadcrumb, Icon, Row, Col, Layout, Card, Carousel } from 'antd'
 import React from 'react'
+import { Button, Modal, Breadcrumb, Row, Col, Layout, Card, Carousel } from 'antd'
+import {
+  HomeOutlined,
+  UserOutlined,
+  FacebookOutlined,
+  InstagramOutlined,
+  GoogleOutlined,
+  TwitterOutlined,
+  LinkedinOutlined,
+  GithubOutlined,
+  AndroidOutlined,
+} from '@ant-design/icons'
 import Link from 'next/link'
 const { Content } = Layout
 
@@ -44,10 +55,13 @@ class About extends React.Component {
           <Button type="primary">Primary</Button>
           <Button>Default</Button>
           <Button type="dashed">Dashed</Button>
-          <Button type="danger">Danger</Button>
+          <Button type="primary" danger>
+            Prime Danger
+          </Button>
+          <Button danger>Danger</Button>
           <Button type="link">Link</Button>
         </div>
-        <Row justify="space-around" type="flex">
+        <Row justify="space-around">
           <Col
             span={20}
             style={{
@@ -75,20 +89,20 @@ class About extends React.Component {
             </div>
           </Col>
         </Row>
-        <Row justify="space-around" type="flex">
+        <Row justify="space-around">
           <Col span={20}>
             <Breadcrumb>
               <Breadcrumb.Item href="">
-                <Icon type="home" />
+                <HomeOutlined />
               </Breadcrumb.Item>
               <Breadcrumb.Item href="">
-                <Icon type="user" />
+                <UserOutlined />
                 <span>Home</span>
               </Breadcrumb.Item>
             </Breadcrumb>
           </Col>
         </Row>
-        <Row justify="space-around" type="flex">
+        <Row justify="space-around">
           <Col span={20} style={{ paddingTop: '30px', paddingBottom: '30px', minHeight: '500px' }}>
             <Content>
               <div>
@@ -147,15 +161,19 @@ class About extends React.Component {
             </Content>
           </Col>
         </Row>
-        <Row justify="space-around" type="flex" style={{ background: '#f9f9f9' }}>
+        <Row justify="space-around" style={{ background: '#f9f9f9' }}>
           <Col md={8} xs={20} style={{ height: '40px', display: 'flex' }}>
             <div style={{ margin: 'auto 0px' }}>&copy; 2019 nextjs antd now.sh</div>
           </Col>
           <Col md={8} xs={20}>
             <div style={{ margin: 'auto', height: '40px', display: 'flex', justifyContent: 'flex-end' }}>
-              <Icon style={{ margin: 'auto 10px', fontSize: 20 }} type="facebook" />
-              <Icon style={{ margin: 'auto 10px', fontSize: 20 }} type="instagram" />
-              <Icon style={{ margin: 'auto 10px', fontSize: 20 }} type="google" />
+              <FacebookOutlined />
+              <InstagramOutlined />
+              <GoogleOutlined />
+              <TwitterOutlined />
+              <LinkedinOutlined />
+              <GithubOutlined />
+              <AndroidOutlined />
             </div>
           </Col>
         </Row>
