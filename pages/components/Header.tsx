@@ -22,19 +22,14 @@ export default function Header({ active }) {
     dispatch,
     state: {
       isLoggedIn,
-      user: { name },
+      user: { _id, name = '-' },
     },
   } = useContext(UserContext)
 
   return (
     <Menu mode="horizontal" selectedKeys={[active]}>
       <Menu.Item key="Index">
-        <Link href="/">
-          <a href="/">
-            <HomeOutlined />
-            {isLoggedIn ? 'Hello ' + name : 'Home'}
-          </a>
-        </Link>
+        {isLoggedIn ? <span><HomeOutlined />Hello <Link href="/user/[id]" as={`/user/${_id}`}>{name}</Link></span> : <Link href="/"><a href="/"><span><HomeOutlined />Home</span></a></Link>}
       </Menu.Item>
       {isLoggedIn && (
         <Menu.Item key="AddUser">

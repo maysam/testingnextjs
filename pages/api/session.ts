@@ -3,12 +3,12 @@ import withMiddleware from 'middlewares/withMiddleware'
 const handler = (req, res) => {
   if (req.method === 'GET') {
     if (req.user) {
-      const { name, email } = req.user
+      const { _id, name, email } = req.user
       return res.status(200).send({
         status: 'ok',
         data: {
           isLoggedIn: true,
-          user: { name, email },
+          user: { _id, name, email },
         },
       })
     }

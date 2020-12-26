@@ -17,7 +17,7 @@ interface Props {
 const stringSorter = field => (a, b) =>
   a[field] === undefined || a[field] < b[field] ? -1 : b[field] === undefined || a[field] > b[field] ? 1 : 0
 
-const linkToUserPage = (text, { _id }) => (
+const linkToUserPage = (text = '-', { _id }) => (
   <Link href="/user/[id]" as={`/user/${_id}`}>
     <a>{text}</a>
   </Link>

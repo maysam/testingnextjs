@@ -15,7 +15,7 @@ import { isValidIranianNationalCode } from '../../lib/validations'
 const { Title } = Typography
 
 const User = ({ user }) => {
-  if (!user || user.name === undefined) {
+  if (!user) { // || user.name === undefined
     return <div>Cannot find user corresponding to id {user._id}</div>
   }
   const uid = user._id

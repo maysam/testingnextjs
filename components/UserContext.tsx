@@ -4,6 +4,7 @@ import Router from 'next/router'
 interface State {
   isLoggedIn: boolean
   user: {
+    _id?: string
     name?: string
   }
 }
